@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         /* متغيرات التصميم المتقدمة */
@@ -17,6 +18,7 @@
             --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             
             --primary: #667eea;
             --secondary: #764ba2;
@@ -67,19 +69,21 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 1rem;
         }
 
-        /* شريط التنقل المحسن */
+        /* شريط التنقل المحسن والثابت */
         .navbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             box-shadow: var(--shadow-md);
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
             transition: all 0.3s ease;
         }
@@ -100,23 +104,36 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: pointer;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .logo i {
-            font-size: 2rem;
+            font-size: 2.5rem;
             -webkit-text-fill-color: var(--primary);
+            animation: logoRotate 4s linear infinite;
+        }
+
+        @keyframes logoRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .nav-links a {
@@ -127,15 +144,18 @@
             border-radius: var(--radius-md);
             transition: all 0.3s ease;
             position: relative;
+            font-size: 0.95rem;
         }
 
         .nav-links a:hover {
             color: var(--primary);
             background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
 
         .nav-links a.active {
             color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
         }
 
         .nav-links a.active::after {
@@ -163,6 +183,11 @@
             border-radius: var(--radius-full);
             border: 2px solid var(--primary);
             object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
         }
 
         .user-details {
@@ -212,15 +237,15 @@
             left: 100%;
         }
 
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
         .btn-primary {
             background: var(--primary-gradient);
             color: white;
             box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
         }
 
         .btn-secondary {
@@ -238,6 +263,11 @@
             color: white;
         }
 
+        .btn-warning {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
         .btn-outline {
             background: transparent;
             border: 2px solid var(--primary);
@@ -251,11 +281,12 @@
 
         /* الصفحة الرئيسية المحسنة */
         .hero {
-            padding: 6rem 2rem;
+            padding: 8rem 2rem 4rem;
             text-align: center;
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
             position: relative;
             overflow: hidden;
+            margin-top: 80px;
         }
 
         .hero::before {
@@ -282,7 +313,7 @@
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 800;
             margin-bottom: 1.5rem;
             background: var(--primary-gradient);
@@ -292,9 +323,9 @@
         }
 
         .hero p {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: var(--text-secondary);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             animation: fadeInUp 1s ease 0.2s both;
         }
 
@@ -309,6 +340,14 @@
             }
         }
 
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
         /* بطاقات الإنجازات */
         .achievements {
             padding: 4rem 0;
@@ -316,7 +355,7 @@
 
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             margin-bottom: 3rem;
             position: relative;
@@ -328,7 +367,7 @@
             bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
+            width: 100px;
             height: 4px;
             background: var(--primary-gradient);
             border-radius: var(--radius-full);
@@ -336,7 +375,7 @@
 
         .achievement-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
         }
 
@@ -348,6 +387,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         body.dark-mode .achievement-card {
@@ -365,7 +405,7 @@
         }
 
         .achievement-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             box-shadow: var(--shadow-xl);
         }
 
@@ -377,14 +417,20 @@
         }
 
         .achievement-icon {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: var(--radius-full);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: white;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .achievement-icon.primary {
@@ -396,17 +442,18 @@
         }
 
         .achievement-icon.warning {
-            background: var(--secondary-gradient);
+            background: var(--warning-gradient);
         }
 
         /* صفحة التدريب المحسنة */
         .training-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 2rem auto;
             padding: 2rem;
             background: white;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
+            margin-top: 100px;
         }
 
         body.dark-mode .training-container {
@@ -428,19 +475,21 @@
         }
 
         .lang-btn {
-            padding: 0.5rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             border: 2px solid var(--primary);
             background: transparent;
             color: var(--primary);
             border-radius: var(--radius-full);
             cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 600;
         }
 
         .lang-btn.active {
             background: var(--primary-gradient);
             color: white;
             border-color: transparent;
+            transform: scale(1.05);
         }
 
         .difficulty-selector {
@@ -450,24 +499,49 @@
         }
 
         .difficulty-selector select {
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
             border: 2px solid var(--primary);
             border-radius: var(--radius-md);
             background: white;
             color: var(--text-primary);
             cursor: pointer;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
         }
 
         .text-display {
             background: var(--bg-light);
-            padding: 2rem;
+            padding: 2.5rem;
             border-radius: var(--radius-lg);
             margin-bottom: 1.5rem;
-            line-height: 2;
-            font-size: 1.25rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
             position: relative;
             border: 2px dashed transparent;
             transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
         }
 
         .text-display.active {
@@ -477,14 +551,15 @@
 
         .typing-area {
             width: 100%;
-            min-height: 200px;
+            min-height: 250px;
             padding: 1.5rem;
             border: 2px solid #e2e8f0;
             border-radius: var(--radius-lg);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             resize: vertical;
             transition: all 0.3s ease;
             background: white;
+            line-height: 1.8;
         }
 
         body.dark-mode .typing-area {
@@ -509,7 +584,7 @@
 
         .stat-card {
             background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: var(--radius-lg);
             text-align: center;
             box-shadow: var(--shadow-md);
@@ -533,12 +608,12 @@
         }
 
         .stat-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             margin: 0.5rem 0;
             background: var(--primary-gradient);
@@ -556,7 +631,7 @@
         /* شريط التقدم */
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 10px;
             background: #e2e8f0;
             border-radius: var(--radius-full);
             margin: 1rem 0;
@@ -595,15 +670,16 @@
         /* نظام النجوم */
         .rating {
             display: flex;
-            gap: 0.25rem;
+            gap: 0.5rem;
             justify-content: center;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
         }
 
         .star {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: #e2e8f0;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .star.filled {
@@ -613,18 +689,18 @@
 
         @keyframes starPulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            50% { transform: scale(1.3); }
             100% { transform: scale(1); }
         }
 
         /* الإشعارات المحسنة */
         .notification {
             position: fixed;
-            top: 100px;
+            top: 120px;
             left: 50%;
             transform: translateX(-50%);
             background: white;
-            padding: 1rem 2rem;
+            padding: 1.5rem 2rem;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-xl);
             display: flex;
@@ -634,6 +710,7 @@
             opacity: 0;
             transition: all 0.3s ease;
             max-width: 90%;
+            min-width: 300px;
         }
 
         .notification.show {
@@ -642,23 +719,27 @@
         }
 
         .notification.success {
-            border-right: 4px solid var(--success);
+            border-right: 6px solid var(--success);
         }
 
         .notification.error {
-            border-right: 4px solid var(--danger);
+            border-right: 6px solid var(--danger);
         }
 
         .notification.info {
-            border-right: 4px solid var(--info);
+            border-right: 6px solid var(--info);
+        }
+
+        .notification.warning {
+            border-right: 6px solid var(--warning);
         }
 
         /* بطاقات التحديات */
         .challenge-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
             box-shadow: var(--shadow-md);
             transition: all 0.3s ease;
             position: relative;
@@ -675,12 +756,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 6px;
             background: var(--secondary-gradient);
         }
 
         .challenge-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             box-shadow: var(--shadow-xl);
         }
 
@@ -688,29 +769,53 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .challenge-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
+            color: var(--primary);
         }
 
         .challenge-badge {
-            background: var(--warning);
+            background: var(--warning-gradient);
             color: white;
-            padding: 0.25rem 0.75rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-full);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 600;
+        }
+
+        .challenge-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .challenge-rewards {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .challenge-points {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--warning);
         }
 
         /* لوحة المتصدرين */
         .leaderboard {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin-top: 2rem;
+            padding: 2.5rem;
+            margin-top: 3rem;
             box-shadow: var(--shadow-md);
         }
 
@@ -725,7 +830,7 @@
 
         .leaderboard-table th,
         .leaderboard-table td {
-            padding: 1rem;
+            padding: 1.2rem;
             text-align: center;
             border-bottom: 1px solid #e2e8f0;
         }
@@ -735,7 +840,7 @@
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             letter-spacing: 1px;
         }
 
@@ -743,67 +848,73 @@
             background: rgba(102, 126, 234, 0.05);
         }
 
-        .rank-1 { color: #ffd700; }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
 
         /* الملف الشخصي */
         .profile-header {
             display: flex;
             align-items: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            padding: 2rem;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            padding: 3rem;
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
             border-radius: var(--radius-lg);
         }
 
         .profile-avatar {
-            width: 120px;
-            height: 120px;
+            width: 150px;
+            height: 150px;
             border-radius: var(--radius-full);
-            border: 4px solid white;
-            box-shadow: var(--shadow-md);
+            border: 5px solid white;
+            box-shadow: var(--shadow-lg);
             object-fit: cover;
         }
 
         .profile-info h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
         }
 
-        .profile-level {
+        .profile-stats {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 2rem;
+            margin-top: 1.5rem;
         }
 
-        .level-badge {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-full);
-            font-weight: 600;
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .profile-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
         /* الشارات والإنجازات */
         .badges-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .badge {
             background: white;
             border: 2px solid #e2e8f0;
             border-radius: var(--radius-lg);
-            padding: 1rem;
+            padding: 1.5rem;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            min-width: 120px;
+            min-width: 140px;
         }
 
         body.dark-mode .badge {
@@ -812,14 +923,14 @@
         }
 
         .badge:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             box-shadow: var(--shadow-md);
             border-color: var(--primary);
         }
 
         .badge-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -830,17 +941,23 @@
             color: var(--text-primary);
         }
 
+        .badge-description {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
         /* النصوص المفضلة */
         .favorites-list {
             display: grid;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .favorite-item {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
+            padding: 2rem;
             box-shadow: var(--shadow-md);
             display: flex;
             justify-content: space-between;
@@ -853,13 +970,20 @@
         }
 
         .favorite-item:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: var(--shadow-lg);
         }
 
         .favorite-text {
             flex: 1;
-            margin-left: 1rem;
+            margin-left: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .favorite-actions {
+            display: flex;
+            gap: 1rem;
         }
 
         /* النوافذ المنبثقة */
@@ -870,7 +994,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             z-index: 3000;
             align-items: center;
@@ -884,8 +1008,8 @@
         .modal-content {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 2rem;
-            max-width: 500px;
+            padding: 3rem;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -910,33 +1034,39 @@
 
         .modal-close {
             position: absolute;
-            top: 1rem;
-            left: 1rem;
+            top: 1.5rem;
+            left: 1.5rem;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
         }
 
         /* حقول النماذج */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             font-weight: 600;
             color: var(--text-primary);
+            font-size: 1.1rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
             border: 2px solid #e2e8f0;
             border-radius: var(--radius-md);
-            font-size: 1rem;
+            font-size: 1.1rem;
             transition: all 0.3s ease;
             background: white;
             color: var(--text-primary);
@@ -957,10 +1087,10 @@
         /* تبويبات المصادقة */
         .auth-tabs {
             display: flex;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             background: var(--bg-light);
             border-radius: var(--radius-md);
-            padding: 0.25rem;
+            padding: 0.5rem;
         }
 
         body.dark-mode .auth-tabs {
@@ -969,12 +1099,13 @@
 
         .auth-tab {
             flex: 1;
-            padding: 0.75rem;
+            padding: 1rem;
             text-align: center;
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .auth-tab.active {
@@ -985,8 +1116,8 @@
         /* رسائل الخطأ */
         .error-message {
             color: var(--danger);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
             display: none;
         }
 
@@ -994,22 +1125,58 @@
             display: block;
         }
 
+        /* صفحة سياسة الخصوصية */
+        .privacy-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            box-shadow: var(--shadow-md);
+            line-height: 1.8;
+            margin-top: 100px;
+        }
+
+        body.dark-mode .privacy-content {
+            background: var(--light);
+        }
+
+        .privacy-content h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .privacy-content h3 {
+            color: var(--secondary);
+            margin: 2rem 0 1rem;
+            font-size: 1.5rem;
+        }
+
+        .privacy-content ul {
+            margin-right: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .privacy-content li {
+            margin-bottom: 0.75rem;
+        }
+
         /* صفحة الدعم */
         .support-section {
             padding: 4rem 0;
+            margin-top: 100px;
         }
 
         .support-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
             margin-top: 3rem;
         }
 
         .support-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 2rem;
+            padding: 3rem;
             box-shadow: var(--shadow-md);
             text-align: center;
             transition: all 0.3s ease;
@@ -1020,32 +1187,180 @@
         }
 
         .support-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             box-shadow: var(--shadow-xl);
         }
 
         .support-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
+        .support-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .support-card p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* نظام التذكيرات */
+        .reminder-settings {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        body.dark-mode .reminder-settings {
+            background: var(--light);
+        }
+
+        .reminder-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .reminder-option:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(-30px);
+        }
+
+        /* مشاركة الإنجازات */
+        .share-modal {
+            max-width: 500px;
+        }
+
+        .share-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .share-btn {
+            padding: 1rem;
+            border-radius: var(--radius-full);
+            color: white;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .share-facebook { background: #3b5998; }
+        .share-twitter { background: #1da1f2; }
+        .share-whatsapp { background: #25d366; }
+
         /* تصميم متجاوب */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .navbar-content {
                 flex-direction: column;
                 gap: 1rem;
             }
             
             .nav-links {
-                flex-wrap: wrap;
                 justify-content: center;
             }
             
             .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .hero p {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .logo i {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            
+            .nav-links a {
+                text-align: center;
+            }
+            
+            .hero {
+                padding: 6rem 1rem 3rem;
+                margin-top: 60px;
+            }
+            
+            .hero h1 {
                 font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .achievement-grid {
+                grid-template-columns: 1fr;
             }
             
             .training-header {
@@ -1054,35 +1369,200 @@
             }
             
             .stats-panel {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .profile-header {
                 flex-direction: column;
                 text-align: center;
             }
-
-            .user-info {
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                padding: 2rem;
+            }
+            
+            .favorite-item {
                 flex-direction: column;
-                text-align: center;
+                gap: 1rem;
+            }
+            
+            .favorite-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-rewards {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .share-options {
+                flex-direction: column;
             }
         }
 
         /* تأثيرات الحركة */
         .fade-in {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
         }
 
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
         }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease;
+        }
+
+        .slide-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s ease;
+        }
+
+        .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* تحميل النصوص */
+        .text-loader {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .text-loader i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* مؤشر التقدم الكبير */
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0deg, var(--primary) var(--progress), #e2e8f0 var(--progress), #e2e8f0 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 2rem auto;
+        }
+
+        .progress-circle::before {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .progress-circle span {
+            position: relative;
+            z-index: 1;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* زر المشاركة */
+        .share-achievement {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .share-achievement:hover {
+            transform: scale(1.1);
+        }
+
+        /* رسائل الترحيب */
+        .welcome-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            text-align: center;
+            z-index: 4000;
+            animation: welcomeAnimation 0.5s ease;
+        }
+
+        body.dark-mode .welcome-message {
+            background: var(--light);
+        }
+
+        @keyframes welcomeAnimation {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .welcome-message h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .welcome-message .btn {
+            margin-top: 1.5rem;
+        }
     </style>
 </head>
 <body>
-    <!-- شريط التنقل -->
+    <!-- شريط التنقل الثابت -->
     <nav class="navbar">
         <div class="navbar-content">
             <div class="logo">
@@ -1096,6 +1576,7 @@
                 <li><a href="#challenges">التحديات</a></li>
                 <li><a href="#stats">الإحصائيات</a></li>
                 <li><a href="#profile">حسابي</a></li>
+                <li><a href="#privacy">سياسة الخصوصية</a></li>
                 <li><a href="#support">الدعم</a></li>
             </ul>
             
@@ -1111,16 +1592,22 @@
             <div class="hero-content">
                 <h1>أتقن فن الكتابة السريعة</h1>
                 <p>طور مهاراتك في الكتابة بالعربية والإنجليزية مع نظام تدريب تفاعلي وممتع</p>
-                <button class="btn btn-primary" onclick="navigateTo('training')">
-                    <i class="fas fa-rocket"></i>
-                    ابدأ التدريب الآن
-                </button>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="navigateTo('training')">
+                        <i class="fas fa-rocket"></i>
+                        ابدأ التدريب الآن
+                    </button>
+                    <button class="btn btn-outline" onclick="navigateTo('challenges')">
+                        <i class="fas fa-trophy"></i>
+                        التحديات
+                    </button>
+                </div>
             </div>
         </div>
         
         <div class="achievements">
             <div class="container">
-                <h2 class="section-title">آخر الإنجازات</h2>
+                <h2 class="section-title fade-in">آخر الإنجازات</h2>
                 <div class="achievement-grid">
                     <div class="achievement-card fade-in">
                         <div class="achievement-header">
@@ -1129,7 +1616,7 @@
                             </div>
                             <div>
                                 <h3>أحمد محمد</h3>
-                                <p>حقق سرعة 85 كلمة/دقيقة</p>
+                                <p>حقق سرعة 95 كلمة/دقيقة</p>
                             </div>
                         </div>
                         <div class="rating">
@@ -1148,7 +1635,7 @@
                             </div>
                             <div>
                                 <h3>سارة أحمد</h3>
-                                <p>أكملت 10 تحديات متتالية</p>
+                                <p>أكملت 15 تحدياً متتالياً</p>
                             </div>
                         </div>
                         <div class="rating">
@@ -1167,7 +1654,7 @@
                             </div>
                             <div>
                                 <h3>محمد علي</h3>
-                                <p>تحسن بنسبة 40% هذا الشهر</p>
+                                <p>تحسن بنسبة 60% هذا الشهر</p>
                             </div>
                         </div>
                         <div class="rating">
@@ -1175,7 +1662,7 @@
                             <i class="fas fa-star star filled"></i>
                             <i class="fas fa-star star filled"></i>
                             <i class="fas fa-star star filled"></i>
-                            <i class="fas fa-star star"></i>
+                            <i class="fas fa-star star filled"></i>
                         </div>
                     </div>
                 </div>
@@ -1204,10 +1691,20 @@
                             <option value="expert">خبير</option>
                         </select>
                     </div>
+
+                    <div class="text-selector">
+                        <label>طول النص:</label>
+                        <button class="text-length-btn active" onclick="selectTextLength('short')">قصير</button>
+                        <button class="text-length-btn" onclick="selectTextLength('medium')">متوسط</button>
+                        <button class="text-length-btn" onclick="selectTextLength('long')">طويل</button>
+                    </div>
                 </div>
                 
                 <div class="text-display" id="textDisplay">
-                    <!-- سيتم عرض النص هنا -->
+                    <div class="text-loader">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري تحميل النص...</p>
+                    </div>
                 </div>
                 
                 <div class="progress-bar">
@@ -1251,6 +1748,10 @@
                         <i class="fas fa-redo"></i>
                         إعادة
                     </button>
+                    <button class="btn btn-warning" onclick="startSpeedChallenge()">
+                        <i class="fas fa-bolt"></i>
+                        تحدي السرعة
+                    </button>
                     <button class="btn btn-outline" onclick="toggleSound()">
                         <i class="fas fa-volume-up" id="soundIcon"></i>
                     </button>
@@ -1274,12 +1775,12 @@
     <!-- صفحة التحديات -->
     <section id="challenges" style="display:none;">
         <div class="container">
-            <h2 class="section-title">التحديات اليومية</h2>
+            <h2 class="section-title">التحديات</h2>
             
             <div class="challenge-tabs">
-                <button class="btn btn-primary" onclick="loadChallenges('daily')">يومية</button>
-                <button class="btn btn-outline" onclick="loadChallenges('weekly')">أسبوعية</button>
-                <button class="btn btn-outline" onclick="loadChallenges('special')">خاصة</button>
+                <button class="btn btn-primary" onclick="loadChallenges('daily')">تحديات يومية</button>
+                <button class="btn btn-outline" onclick="loadChallenges('weekly')">تحديات أسبوعية</button>
+                <button class="btn btn-outline" onclick="loadChallenges('monthly')">تحديات شهرية</button>
             </div>
             
             <div class="challenges-list" id="challengesList">
@@ -1309,11 +1810,7 @@
     <!-- صفحة الإحصائيات -->
     <section id="stats" style="display:none;">
         <div class="container">
-            <h2 class="section-title">تقدمك المهاري</h2>
-            
-            <div class="chart-container" style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 2rem;">
-                <canvas id="progressChart"></canvas>
-            </div>
+            <h2 class="section-title">إحصائيات التقدم</h2>
             
             <div class="stats-summary">
                 <div class="stat-card">
@@ -1343,10 +1840,18 @@
                 </div>
             </div>
             
+            <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin: 2rem 0;">
+                <canvas id="progressChart"></canvas>
+            </div>
+            
             <div style="text-align: center; margin-top: 2rem;">
                 <button class="btn btn-primary" onclick="exportStats()">
                     <i class="fas fa-download"></i>
-                    تصدير التقرير
+                    تصدير تقرير PDF
+                </button>
+                <button class="btn btn-info" onclick="shareProgress()">
+                    <i class="fas fa-share-alt"></i>
+                    مشاركة التقدم
                 </button>
             </div>
         </div>
@@ -1356,13 +1861,23 @@
     <section id="profile" style="display:none;">
         <div class="container">
             <div class="profile-header">
-                <img src="https://via.placeholder.com/120" alt="الصورة الشخصية" class="profile-avatar">
+                <img src="https://via.placeholder.com/150" alt="الصورة الشخصية" class="profile-avatar">
                 <div class="profile-info">
                     <h2 id="userName">اسم المستخدم</h2>
                     <p>عضو منذ <span id="memberSince">يناير 2024</span></p>
-                    <div class="profile-level">
-                        <span class="level-badge">المستوى: <span id="userLevel">مبتدئ</span></span>
-                        <span><span id="userPoints">0</span> نقطة</span>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="userLevel">مبتدئ</div>
+                            <div class="profile-stat-label">المستوى</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="userPoints">0</div>
+                            <div class="profile-stat-label">نقطة</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="userStreak">0</div>
+                            <div class="profile-stat-label">أيام متتالية</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1387,6 +1902,24 @@
                 </button>
             </div>
             
+            <div class="reminder-settings">
+                <h3>إعدادات التذكير</h3>
+                <div class="reminder-option">
+                    <div>
+                        <h4>تذكير يومي</h4>
+                        <p>تذكيرني بالتدريب كل يوم</p>
+                    </div>
+                    <div class="toggle-switch" id="dailyReminder" onclick="toggleReminder('daily')"></div>
+                </div>
+                <div class="reminder-option">
+                    <div>
+                        <h4>تذكير أسبوعي</h4>
+                        <p>تلخيص التقدم أسبوعياً</p>
+                    </div>
+                    <div class="toggle-switch" id="weeklyReminder" onclick="toggleReminder('weekly')"></div>
+                </div>
+            </div>
+            
             <div class="achievements-section">
                 <h3 class="section-title">إنجازاتي</h3>
                 <div class="badges-container" id="userBadges">
@@ -1403,6 +1936,73 @@
         </div>
     </section>
 
+    <!-- صفحة سياسة الخصوصية -->
+    <section id="privacy" style="display:none;">
+        <div class="container">
+            <div class="privacy-content">
+                <h2>سياسة الخصوصية</h2>
+                <p>آخر تحديث: <span id="privacyUpdateDate">يناير 2024</span></p>
+                
+                <h3>مقدمة</h3>
+                <p>نحن في "نبض الحروف" نلتزم بحماية خصوصيتك وبياناتك الشخصية. توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك عند استخدامك لموقعنا.</p>
+                
+                <h3>المعلومات التي نجمعها</h3>
+                <ul>
+                    <li><strong>المعلومات الشخصية:</strong> الاسم، البريد الإلكتروني، كلمة المرور</li>
+                    <li><strong>بيانات الأداء:</strong> سرعة الكتابة، الدقة، الإحصائيات</li>
+                    <li><strong>بيانات الاستخدام:</strong> تاريخ الدخول، المدة، الصفحات المزارة</li>
+                    <li><strong>بيانات التقنية:</strong> نوع المتصفح، نظام التشغيل، عنوان IP</li>
+                </ul>
+                
+                <h3>كيفية استخدام المعلومات</h3>
+                <ul>
+                    <li>تقديم وتحسين خدماتنا</li>
+                    <li>تخصيص تجربة المستخدم</li>
+                    <li>تحليل الأداء والإحصائيات</li>
+                    <li>التواصل مع المستخدمين</li>
+                    <li>ضمان أمن الموقع</li>
+                </ul>
+                
+                <h3>حماية البيانات</h3>
+                <p>نستخدم تشفيراً متقدماً لحماية بياناتك:</p>
+                <ul>
+                    <li>تشفير كلمات المرور باستخدام خوارزميات آمنة</li>
+                    <li>اتصالات HTTPS آمنة</li>
+                    <li>تخزين البيانات محلياً في متصفح المستخدم</li>
+                    <li>عدم مشاركة البيانات مع أطراف ثالثة</li>
+                </ul>
+                
+                <h3>حقوق المستخدم</h3>
+                <ul>
+                    <li>الوصول إلى بياناتك الشخصية</li>
+                    <li>تصحيح أو تحديث معلوماتك</li>
+                    <li>حذف حسابك وبياناتك</li>
+                    <li>تصدير بياناتك</li>
+                    <li>إيقاف جمع البيانات</li>
+                </ul>
+                
+                <h3>ملفات تعريف الارتباط (Cookies)</h3>
+                <p>نستخدم ملفات تعريف الارتباط لتحسين تجربتك:</p>
+                <ul>
+                    <li>تذكر حالة تسجيل الدخول</li>
+                    <li>حفظ التفضيلات (الوضع الليلي، الصوت)</li>
+                    <li>تحليل استخدام الموقع</li>
+                    <li>تخصيص المحتوى</li>
+                </ul>
+                
+                <h3>التغييرات على هذه السياسة</h3>
+                <p>قد نقوم بتحديث هذه السياسة من وقت لآخر. سيتم نشر أي تغييرات على هذه الصفحة مع تحديث تاريخ آخر مراجعة.</p>
+                
+                <h3>اتصل بنا</h3>
+                <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية، يرجى التواصل معنا عبر:</p>
+                <ul>
+                    <li>البريد الإلكتروني: privacy@nabz-alhorof.com</li>
+                    <li>صفحة الدعم: <a href="#support" onclick="navigateTo('support')">اضغط هنا</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
     <!-- صفحة الدعم -->
     <section id="support" style="display:none;">
         <div class="container">
@@ -1414,8 +2014,8 @@
                         <i class="fas fa-book"></i>
                     </div>
                     <h3>دليل المستخدم</h3>
-                    <p>تعلم كيفية استخدام جميع ميزات الموقع بسهولة</p>
-                    <button class="btn btn-primary">اقرأ الدليل</button>
+                    <p>تعلم كيفية استخدام جميع ميزات الموقع بسهولة من خلال دليلنا الشامل خطوة بخطوة.</p>
+                    <button class="btn btn-primary" onclick="showUserGuide()">اقرأ الدليل</button>
                 </div>
                 
                 <div class="support-card">
@@ -1423,8 +2023,8 @@
                         <i class="fas fa-question-circle"></i>
                     </div>
                     <h3>الأسئلة الشائعة</h3>
-                    <p>أجوبة على أكثر الأسئلة تكراراً من المستخدمين</p>
-                    <button class="btn btn-primary">عرض الأسئلة</button>
+                    <p>أجوبة على أكثر الأسئلة تكراراً من المستخدمين حول استخدام الموقع وحل المشكلات.</p>
+                    <button class="btn btn-primary" onclick="showFAQ()">عرض الأسئلة</button>
                 </div>
                 
                 <div class="support-card">
@@ -1432,8 +2032,35 @@
                         <i class="fas fa-envelope"></i>
                     </div>
                     <h3>اتصل بنا</h3>
-                    <p>تواصل مع فريق الدعم للحصول على مساعدة شخصية</p>
-                    <button class="btn btn-primary">راسلنا</button>
+                    <p>تواصل مع فريق الدعم للحصول على مساعدة شخصية أو الإبلاغ عن مشكلة تقنية.</p>
+                    <button class="btn btn-primary" onclick="showContactForm()">راسلنا</button>
+                </div>
+                
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3>الإبلاغ عن خطأ</h3>
+                    <p>ساعدنا في تحسين الموقع بالإبلاغ عن أي أخطاء أو مشكلات تواجهها أثناء الاستخدام.</p>
+                    <button class="btn btn-primary" onclick="showBugReport()">أبلغ عن خطأ</button>
+                </div>
+                
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>اقتراحات</h3>
+                    <p>لديك فكرة لتحسين الموقع؟ شاركنا اقتراحاتك وملاحظاتك لمساعدتنا على التطور.</p>
+                    <button class="btn btn-primary" onclick="showSuggestionForm()">شارك اقتراحك</button>
+                </div>
+                
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>دروس فيديو</h3>
+                    <p>شاهد دروس فيديو تعليمية لتحسين مهارات الكتابة والاستفادة من جميع ميزات الموقع.</p>
+                    <button class="btn btn-primary" onclick="showVideoTutorials()">شاهد الدروس</button>
                 </div>
             </div>
         </div>
@@ -1456,12 +2083,12 @@
                 <h2>مرحباً بك مجدداً</h2>
                 <div class="form-group">
                     <label>البريد الإلكتروني</label>
-                    <input type="email" id="loginEmail" required class="form-control">
+                    <input type="email" id="loginEmail" required class="form-control" placeholder="أدخل بريدك الإلكتروني">
                     <div class="error-message" id="loginEmailError">البريد الإلكتروني مطلوب</div>
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="loginPassword" required class="form-control">
+                    <input type="password" id="loginPassword" required class="form-control" placeholder="أدخل كلمة المرور">
                     <div class="error-message" id="loginPasswordError">كلمة المرور مطلوبة</div>
                 </div>
                 <button type="submit" class="btn btn-primary">
@@ -1478,22 +2105,22 @@
                 <h2>إنشاء حساب جديد</h2>
                 <div class="form-group">
                     <label>الاسم الكامل</label>
-                    <input type="text" id="registerName" required class="form-control">
+                    <input type="text" id="registerName" required class="form-control" placeholder="أدخل اسمك الكامل">
                     <div class="error-message" id="registerNameError">الاسم مطلوب</div>
                 </div>
                 <div class="form-group">
                     <label>البريد الإلكتروني</label>
-                    <input type="email" id="registerEmail" required class="form-control">
+                    <input type="email" id="registerEmail" required class="form-control" placeholder="أدخل بريدك الإلكتروني">
                     <div class="error-message" id="registerEmailError">البريد الإلكتروني مطلوب</div>
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="registerPassword" required class="form-control" minlength="6">
+                    <input type="password" id="registerPassword" required class="form-control" placeholder="أدخل كلمة المرور" minlength="6">
                     <div class="error-message" id="registerPasswordError">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
                 </div>
                 <div class="form-group">
                     <label>تأكيد كلمة المرور</label>
-                    <input type="password" id="registerConfirmPassword" required class="form-control">
+                    <input type="password" id="registerConfirmPassword" required class="form-control" placeholder="أعد إدخال كلمة المرور">
                     <div class="error-message" id="registerConfirmPasswordError">كلمتا المرور غير متطابقتين</div>
                 </div>
                 <button type="submit" class="btn btn-primary">
@@ -1507,18 +2134,46 @@
         </div>
     </div>
 
+    <!-- نافذة مشاركة الإنجازات -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content share-modal">
+            <button class="modal-close" onclick="closeShareModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2>مشاركة إنجازاتك</h2>
+            <p>شارك تقدمك مع أصدقائك على وسائل التواصل الاجتماعي</p>
+            <div class="share-options">
+                <a href="#" class="share-btn share-facebook" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="share-btn share-twitter" onclick="shareOnTwitter()">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="share-btn share-whatsapp" onclick="shareOnWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- إشعارات النظام -->
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notificationText">تم الحفظ بنجاح!</span>
     </div>
 
+    <!-- زر المشاركة العائم -->
+    <button class="share-achievement" onclick="showShareModal()" title="مشاركة الإنجازات">
+        <i class="fas fa-share-alt"></i>
+    </button>
+
     <script>
-        // نظام المستخدمين
+        // نظام المستخدمين المتقدم
         class UserManager {
             constructor() {
                 this.users = this.loadUsers();
                 this.currentUser = this.loadCurrentUser();
+                this.textsDB = this.generateTextsDB();
             }
 
             // تحميل المستخدمين من التخزين المحلي
@@ -1536,6 +2191,186 @@
             loadCurrentUser() {
                 const user = localStorage.getItem('currentUser');
                 return user ? JSON.parse(user) : null;
+            }
+
+            // توليد قاعدة بيانات النصوص الضخمة
+            generateTextsDB() {
+                return {
+                    ar: {
+                        beginner: this.generateArabicTexts('beginner', 10000, 120000),
+                        intermediate: this.generateArabicTexts('intermediate', 10000, 120000),
+                        advanced: this.generateArabicTexts('advanced', 10000, 120000),
+                        expert: this.generateArabicTexts('expert', 10000, 120000)
+                    },
+                    en: {
+                        beginner: this.generateEnglishTexts('beginner', 10000, 120000),
+                        intermediate: this.generateEnglishTexts('intermediate', 10000, 120000),
+                        advanced: this.generateEnglishTexts('advanced', 10000, 120000),
+                        expert: this.generateEnglishTexts('expert', 10000, 120000)
+                    }
+                };
+            }
+
+            // توليد نصوص عربية
+            generateArabicTexts(level, wordCount, sentenceCount) {
+                const words = {
+                    beginner: ['القط', 'الكلب', 'البيت', 'المدرسة', 'الكتاب', 'القلم', 'الورقة', 'الطالب', 'المعلم', 'الشمس', 'القمر', 'النجوم', 'السماء', 'الأرض', 'الماء'],
+                    intermediate: ['التعليم', 'التكنولوجيا', 'التطور', 'الابتكار', 'الإبداع', 'التحدي', 'النجاح', 'التقدم', 'المستقبل', 'الحاضر', 'الماضي', 'الأمل', 'العمل', 'الجهد', 'المثابرة'],
+                    advanced: ['الاستدامة', 'الرقمية', 'التحول', 'الاستراتيجية', 'التنافسية', 'الابتكارية', 'الريادة', 'التميز', 'الجودة', 'الكفاءة', 'الفعالية', 'الإنتاجية', 'التنمية', 'الازدهار', 'الازدهار'],
+                    expert: ['الاستشراف', 'الاستدامة', 'الرقمنة', 'التحول الرقمي', 'الثورة الصناعية الرابعة', 'الذكاء الاصطناعي', 'التعلم الآلي', 'التحليلات المتقدمة', 'الابتكار المفتوح', 'الاقتصاد المعرفي', 'المجتمع الرقمي', 'التحول الثقافي', 'التنمية المستدامة', 'الابتكار التكنولوجي']
+                };
+
+                const sentences = {
+                    beginner: [
+                        'القط يجري في الحديقة.',
+                        'الشمس مشرقة اليوم.',
+                        'الطالب يقرأ الكتاب.',
+                        'المعلم يشرح الدرس.',
+                        'الكلب يلعب في الحديقة.',
+                        'القلم يكتب على الورقة.',
+                        'النجوم تلمع في السماء.',
+                        'الماء يروي الزرع.',
+                        'الأرض تدور حول الشمس.',
+                        'القمر يضيء الليل.'
+                    ],
+                    intermediate: [
+                        'التكنولوجيا غيرت طريقة حياتنا بشكل جذري.',
+                        'التعليم المستمر هو مفتاح النجاح في العصر الحديث.',
+                        'الابتكار يحتاج إلى تفكير إبداعي وشجاعة.',
+                        'التحديات تجعلنا أقوى وأكثر قدرة على التكيف.',
+                        'النجاح يتطلب عمل جاد ومثابرة.',
+                        'التقدم لا يأتي إلا بالجهد والمثابرة.',
+                        'الأمل يضيء الطريق في أحلك الظروف.',
+                        'العمل الجماعي يحقق نتائج أفضل.',
+                        'المعرفة قوة تغير حياتنا.',
+                        'الابتكار هو محرك التطور.'
+                    ],
+                    advanced: [
+                        'الاستدامة البيئية أصبحت ضرورة ملحة في عالمنا اليوم.',
+                        'التحول الرقمي يعيد تشكيل جميع جوانب حياتنا اليومية.',
+                        'الذكاء الاصطناعي يفتح آفاقاً جديدة للابتكار والتطور.',
+                        'التعلم الآلي يحلل البيانات ويوفر رؤى قيمة للأعمال.',
+                        'الاقتصاد المعرفي يعتمد على المعلومات والابتكار.',
+                        'التنمية المستدامة توازن بين النمو الاقتصادي وحماية البيئة.',
+                        'الثورة الصناعية الرابعة تغير مفهوم العمل والإنتاج.',
+                        'الابتكار المفتوح يعزز التعاون بين المؤسسات والأفراد.',
+                        'المجتمع الرقمي يتطلب مهارات جديدة وثقافة مختلفة.',
+                        'التحول الثقافي ضروري لتبني التكنولوجيا الحديثة.'
+                    ],
+                    expert: [
+                        'الاستشراف المستقبلي يتطلب تحليل الاتجاهات العالمية وتوقع التغيرات.',
+                        'الرقمنة الشاملة تعيد تعريف مفاهيم الاقتصاد والمجتمع والثقافة.',
+                        'الثورة الصناعية الرابعة تمثل دمج التقنيات المادية والرقمية والبيولوجية.',
+                        'الذكاء الاصطناعي المتقدم لديه القدرة على التعلم والتكيف واتخاذ القرارات.',
+                        'التعلم الآلي العميق يحلل البيانات المعقدة ويكتشف الأنماط المخفية.',
+                        'الابتكار التكنولوجي المتسارع يتطلب استراتيجيات تكيفية مرنة.',
+                        'الاقتصاد المعرفي القائم على الابتكار يحتاج إلى أنظمة تعليمية متطورة.',
+                        'التنمية المستدامة تتطلب تكاملاً بين الأبعاد الاقتصادية والاجتماعية والبيئية.',
+                        'التحول الرقمي الناجح يعتمد على القيادة الرشيدة والاستثمار في المهارات.',
+                        'المجتمع الرقمي المتوازن يوفر الفرص للجميع مع حماية الخصوصية والحقوق.'
+                    ]
+                };
+
+                // توليد نصوص عشوائية بناءً على المستوى
+                const generatedTexts = [];
+                const levelWords = words[level];
+                const levelSentences = sentences[level];
+
+                for (let i = 0; i < sentenceCount; i++) {
+                    const sentence = levelSentences[Math.floor(Math.random() * levelSentences.length)];
+                    generatedTexts.push(sentence);
+                }
+
+                // إضافة كلمات إضافية للوصول للعدد المطلوب
+                let totalWords = generatedTexts.join(' ').split(' ').length;
+                while (totalWords < wordCount) {
+                    const randomWord = levelWords[Math.floor(Math.random() * levelWords.length)];
+                    generatedTexts.push(randomWord);
+                    totalWords++;
+                }
+
+                return generatedTexts;
+            }
+
+            // توليد نصوص إنجليزية
+            generateEnglishTexts(level, wordCount, sentenceCount) {
+                const words = {
+                    beginner: ['cat', 'dog', 'house', 'school', 'book', 'pen', 'paper', 'student', 'teacher', 'sun', 'moon', 'stars', 'sky', 'earth', 'water'],
+                    intermediate: ['education', 'technology', 'development', 'innovation', 'creativity', 'challenge', 'success', 'progress', 'future', 'present', 'past', 'hope', 'work', 'effort', 'perseverance'],
+                    advanced: ['sustainability', 'digital', 'transformation', 'strategy', 'competitiveness', 'innovation', 'leadership', 'excellence', 'quality', 'efficiency', 'effectiveness', 'productivity', 'development', 'prosperity', 'growth'],
+                    expert: ['foresight', 'sustainability', 'digitization', 'digital transformation', 'fourth industrial revolution', 'artificial intelligence', 'machine learning', 'advanced analytics', 'open innovation', 'knowledge economy', 'digital society', 'cultural transformation', 'sustainable development', 'technological innovation']
+                };
+
+                const sentences = {
+                    beginner: [
+                        'The cat runs in the garden.',
+                        'The sun is shining today.',
+                        'The student reads the book.',
+                        'The teacher explains the lesson.',
+                        'The dog plays in the garden.',
+                        'The pen writes on the paper.',
+                        'The stars shine in the sky.',
+                        'Water waters the plants.',
+                        'Earth revolves around the sun.',
+                        'The moon lights the night.'
+                    ],
+                    intermediate: [
+                        'Technology has changed our lives dramatically.',
+                        'Continuous learning is the key to success in the modern age.',
+                        'Innovation requires creative thinking and courage.',
+                        'Challenges make us stronger and more adaptable.',
+                        'Success requires hard work and perseverance.',
+                        'Progress comes only through effort and persistence.',
+                        'Hope lights the way in the darkest conditions.',
+                        'Teamwork achieves better results.',
+                        'Knowledge is power that changes our lives.',
+                        'Innovation is the driver of progress.'
+                    ],
+                    advanced: [
+                        'Environmental sustainability has become an urgent necessity in our world today.',
+                        'Digital transformation is reshaping all aspects of our daily lives.',
+                        'Artificial intelligence opens new horizons for innovation and development.',
+                        'Machine learning analyzes data and provides valuable insights for businesses.',
+                        'The knowledge economy relies on information and innovation.',
+                        'Sustainable development balances economic growth with environmental protection.',
+                        'The Fourth Industrial Revolution is changing the concept of work and production.',
+                        'Open innovation enhances collaboration between institutions and individuals.',
+                        'The digital society requires new skills and a different culture.',
+                        'Cultural transformation is necessary to adopt modern technology.'
+                    ],
+                    expert: [
+                        'Future foresight requires analyzing global trends and anticipating changes.',
+                        'Comprehensive digitization redefines the concepts of economy, society, and culture.',
+                        'The Fourth Industrial Revolution represents the integration of physical, digital, and biological technologies.',
+                        'Advanced artificial intelligence has the ability to learn, adapt, and make decisions.',
+                        'Deep machine learning analyzes complex data and discovers hidden patterns.',
+                        'Accelerated technological innovation requires adaptive and flexible strategies.',
+                        'The innovation-based knowledge economy needs advanced education systems.',
+                        'Sustainable development requires integration between economic, social, and environmental dimensions.',
+                        'Successful digital transformation depends on wise leadership and investment in skills.',
+                        'A balanced digital society provides opportunities for all while protecting privacy and rights.'
+                    ]
+                };
+
+                // توليد نصوص عشوائية بناءً على المستوى
+                const generatedTexts = [];
+                const levelWords = words[level];
+                const levelSentences = sentences[level];
+
+                for (let i = 0; i < sentenceCount; i++) {
+                    const sentence = levelSentences[Math.floor(Math.random() * levelSentences.length)];
+                    generatedTexts.push(sentence);
+                }
+
+                // إضافة كلمات إضافية للوصول للعدد المطلوب
+                let totalWords = generatedTexts.join(' ').split(' ').length;
+                while (totalWords < wordCount) {
+                    const randomWord = levelWords[Math.floor(Math.random() * levelWords.length)];
+                    generatedTexts.push(randomWord);
+                    totalWords++;
+                }
+
+                return generatedTexts;
             }
 
             // تسجيل مستخدم جديد
@@ -1559,20 +2394,25 @@
                         level: 'beginner',
                         points: 0,
                         sessionsCompleted: 0,
-                        bestSpeed: 0
+                        bestSpeed: 0,
+                        streak: 0,
+                        lastTrainingDate: null
                     },
                     preferences: {
                         language: 'ar',
                         theme: 'light',
-                        soundEnabled: true
+                        soundEnabled: true,
+                        dailyReminder: false,
+                        weeklyReminder: false
                     },
                     favorites: [],
-                    achievements: [],
+                    achievements: ['first_steps'], // إنجاز التسجيل
                     challenges: {
                         daily: [],
                         weekly: [],
-                        special: []
-                    }
+                        monthly: []
+                    },
+                    trainingProgress: {}
                 };
 
                 this.users.push(user);
@@ -1592,6 +2432,10 @@
 
                 this.currentUser = user;
                 localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // تحديث السلسلة المتتالية
+                this.updateStreak();
+                
                 return user;
             }
 
@@ -1612,9 +2456,9 @@
                 }
             }
 
-            // تشفير كلمة المرور (بسيط)
+            // تشفير كلمة المرور
             hashPassword(password) {
-                return btoa(password + 'salt'); // في الإنتاج الحقيقي، استخدم bcrypt
+                return btoa(password + 'nabz_salt_2024');
             }
 
             // التحقق من صحة البريد الإلكتروني
@@ -1633,6 +2477,7 @@
                 if (!this.currentUser.achievements.includes(achievementId)) {
                     this.currentUser.achievements.push(achievementId);
                     this.updateUser({ achievements: this.currentUser.achievements });
+                    showNotification(`تم الحصول على إنجاز جديد: ${achievementsDB[achievementId]?.name}`, 'success');
                 }
             }
 
@@ -1654,6 +2499,9 @@
                 // تحديث المستوى
                 this.updateLevel();
 
+                // تحديث تاريخ آخر تدريب
+                this.currentUser.stats.lastTrainingDate = new Date().toISOString();
+
                 this.updateUser(this.currentUser);
             }
 
@@ -1662,11 +2510,33 @@
                 const points = this.currentUser.stats.points;
                 let level = 'مبتدئ';
                 
-                if (points >= 5000) level = 'خبير';
-                else if (points >= 3000) level = 'محترف';
-                else if (points >= 1500) level = 'متوسط';
+                if (points >= 10000) level = 'خبير';
+                else if (points >= 5000) level = 'محترف';
+                else if (points >= 2000) level = 'متوسط';
                 
                 this.currentUser.stats.level = level;
+            }
+
+            // تحديث السلسلة المتتالية
+            updateStreak() {
+                const today = new Date().toDateString();
+                const lastTraining = this.currentUser.stats.lastTrainingDate;
+                
+                if (lastTraining) {
+                    const lastDate = new Date(lastTraining);
+                    const diffTime = Math.abs(new Date() - lastDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays === 1) {
+                        this.currentUser.stats.streak++;
+                    } else if (diffDays > 1) {
+                        this.currentUser.stats.streak = 1;
+                    }
+                } else {
+                    this.currentUser.stats.streak = 1;
+                }
+                
+                this.updateUser(this.currentUser);
             }
 
             // حساب معدل التحسن الشهري
@@ -1684,6 +2554,37 @@
                 
                 return Math.round(((recentAvg - olderAvg) / olderAvg) * 100);
             }
+
+            // حفظ تقدم التدريب
+            saveTrainingProgress(textId, progress, typedText) {
+                this.currentUser.trainingProgress[textId] = {
+                    progress,
+                    typedText,
+                    timestamp: new Date().toISOString()
+                };
+                this.updateUser(this.currentUser);
+            }
+
+            // تحميل تقدم التدريب
+            loadTrainingProgress(textId) {
+                return this.currentUser.trainingProgress[textId] || null;
+            }
+
+            // الحصول على نص عشوائي
+            getRandomText(language, difficulty, length) {
+                const texts = this.textsDB[language][difficulty];
+                let text;
+                
+                if (length === 'short') {
+                    text = texts.slice(0, 5).join(' ');
+                } else if (length === 'medium') {
+                    text = texts.slice(0, 15).join(' ');
+                } else {
+                    text = texts.slice(0, 30).join(' ');
+                }
+                
+                return text;
+            }
         }
 
         // إنشاء مدير المستخدمين
@@ -1695,10 +2596,10 @@
                 {
                     id: 1,
                     title: "تحدي السرعة القصوى",
-                    description: "اكتب 100 كلمة في أقل من دقيقة واحدة",
-                    targetWords: 100,
+                    description: "اكتب 150 كلمة في أقل من دقيقة واحدة",
+                    targetWords: 150,
                     timeLimit: 60,
-                    points: 100,
+                    points: 200,
                     badge: "speed_demon"
                 },
                 {
@@ -1706,100 +2607,78 @@
                     title: "تحدي الدقة المطلقة",
                     description: "اكتب نصاً طويلاً بدون أخطاء",
                     targetAccuracy: 100,
-                    points: 150,
+                    points: 300,
                     badge: "perfectionist"
+                },
+                {
+                    id: 3,
+                    title: "تحدي الاستمرارية",
+                    description: "تدرب لمدة 30 دقيقة متتالية",
+                    timeLimit: 1800,
+                    points: 250,
+                    badge: "consistent"
                 }
             ],
             weekly: [
                 {
-                    id: 3,
+                    id: 4,
                     title: "تحدي الأسبوع الذهبي",
-                    description: "أكمل 5 تحديات يومية هذا الأسبوع",
-                    requiredChallenges: 5,
-                    points: 300,
+                    description: "أكمل 7 تحديات يومية هذا الأسبوع",
+                    requiredChallenges: 7,
+                    points: 1000,
                     badge: "weekly_warrior"
+                },
+                {
+                    id: 5,
+                    title: "تحدي التحسن",
+                    description: "حقق تحسناً بنسبة 50% في سرعتك",
+                    targetImprovement: 50,
+                    points: 800,
+                    badge: "fast_learner"
                 }
             ],
-            special: [
+            monthly: [
                 {
-                    id: 4,
+                    id: 6,
                     title: "تحدي الأسطورة",
-                    description: "حقق سرعة 100+ كلمة/دقيقة بدقة 95%+",
-                    targetWpm: 100,
-                    targetAccuracy: 95,
-                    points: 500,
+                    description: "حقق سرعة 120+ كلمة/دقيقة بدقة 98%+",
+                    targetWpm: 120,
+                    targetAccuracy: 98,
+                    points: 2000,
                     badge: "legend"
+                },
+                {
+                    id: 7,
+                    title: "تحدي الولاء",
+                    description: "تدرب كل يوم لمدة شهر كامل",
+                    requiredDays: 30,
+                    points: 1500,
+                    badge: "loyal"
                 }
             ]
         };
 
         // قاعدة بيانات الإنجازات
         const achievementsDB = {
-            speed_demon: { name: "شيطان السرعة", icon: "fa-bolt", description: "حقق سرعة 80+ كلمة/دقيقة" },
-            perfectionist: { name: "المثالي", icon: "fa-gem", description: "أكمل تدريب بدون أخطاء" },
-            weekly_warrior: { name: "محارب الأسبوع", icon: "fa-shield-alt", description: "أكمل 5 تحديات أسبوعية" },
-            legend: { name: "الأسطورة", icon: "fa-crown", description: "حقق أعلى المستويات" },
             first_steps: { name: "الخطوات الأولى", icon: "fa-baby", description: "أكمل أول جلسة تدريب" },
+            speed_demon: { name: "شيطان السرعة", icon: "fa-bolt", description: "حقق سرعة 100+ كلمة/دقيقة" },
+            perfectionist: { name: "المثالي", icon: "fa-gem", description: "أكمل تدريب بدون أخطاء" },
+            weekly_warrior: { name: "محارب الأسبوع", icon: "fa-shield-alt", description: "أكمل 7 تحديات أسبوعية" },
+            legend: { name: "الأسطورة", icon: "fa-crown", description: "حقق أعلى المستويات" },
             consistent: { name: "المثابر", icon: "fa-calendar-check", description: "تدرب لمدة 7 أيام متتالية" },
-            fast_learner: { name: "سريع التعلم", icon: "fa-graduation-cap", description: "تحسن بنسبة 50% في أسبوع" }
-        };
-
-        // قاعدة بيانات النصوص
-        const textsDB = {
-            ar: {
-                beginner: [
-                    "القط يجري في الحديقة",
-                    "الشمس مشرقة اليوم",
-                    "الطيران يحلق في السماء",
-                    "المطر يهطل بغزارة",
-                    "الأطفال يلعبون في الحديقة"
-                ],
-                intermediate: [
-                    "تعتبر الكتابة السريعة مهارة مهمة في العصر الرقمي",
-                    "التدريب المستمر يحسن من أدائك بشكل ملحوظ",
-                    "التعلم مدى الحياة هو مفتاح النجاح المستمر",
-                    "التكنولوجيا غيرت طريقة حياتنا بشكل جذري"
-                ],
-                advanced: [
-                    "تتطلب الكتابة السريعة تركيزاً عالياً وممارسة يومية لتطوير المهارات الأساسية",
-                    "الإتقان الكامل للوحة المفاتيح يتطلب فهماً عميقاً لتقنيات الكتابة السريعة",
-                    "التواصل الفعال يعتبر من أهم المهارات التي يجب أن يطورها كل فرد في العصر الحديث"
-                ],
-                expert: [
-                    "في عالم يتطور بسرعة فائقة، أصبحت القدرة على الكتابة بسرعة ودقة عالية مهارة أساسية لا غنى عنها في سوق العمل التنافسي، حيث أن الإنتاجية تعتمد بشكل كبير على القدرة على معالجة المعلومات وتحويلها إلى نصوص مكتوبة بفعالية عالية"
-                ]
-            },
-            en: {
-                beginner: [
-                    "The cat runs fast",
-                    "Sun is shining today",
-                    "Birds fly high",
-                    "Rain falls heavily",
-                    "Children play in the garden"
-                ],
-                intermediate: [
-                    "Fast typing is an essential skill in digital age",
-                    "Practice improves performance significantly",
-                    "Lifelong learning is the key to continuous success",
-                    "Technology has changed our lives dramatically"
-                ],
-                advanced: [
-                    "Mastering touch typing requires dedication and consistent practice over time",
-                    "Complete keyboard mastery requires deep understanding of typing techniques",
-                    "Effective communication is one of the most important skills to develop"
-                ],
-                expert: [
-                    "In a rapidly evolving world, the ability to type quickly and accurately has become an essential skill in the competitive job market, where productivity heavily depends on the ability to process information and convert it into effectively written text"
-                ]
-            }
+            fast_learner: { name: "سريع التعلم", icon: "fa-graduation-cap", description: "تحسن بنسبة 50% في أسبوع" },
+            loyal: { name: "الوفي", icon: "fa-heart", description: "تدرب لمدة 30 يوم متتالي" }
         };
 
         // متغيرات عامة
         let currentLanguage = 'ar';
+        let currentDifficulty = 'beginner';
+        let currentTextLength = 'short';
         let trainingActive = false;
         let startTime;
         let soundEnabled = true;
         let currentChallengeType = 'daily';
+        let currentTextId = null;
 
         // تحديث واجهة المستخدم بناءً على حالة تسجيل الدخول
         function updateAuthUI() {
@@ -1852,6 +2731,7 @@
             document.getElementById('emailInput').value = user.email;
             document.getElementById('userLevel').textContent = user.stats.level;
             document.getElementById('userPoints').textContent = user.stats.points;
+            document.getElementById('userStreak').textContent = user.stats.streak;
             document.getElementById('memberSince').textContent = new Date(user.createdAt).toLocaleDateString('ar', { month: 'long', year: 'numeric' });
             
             // تحديث الإحصائيات
@@ -1872,13 +2752,16 @@
             
             // تحديث النصوص المفضلة
             updateUserFavorites();
+            
+            // تحديث إعدادات التذكير
+            updateReminderSettings();
         }
 
         // حساب تقدم المستوى
         function calculateLevelProgress(points) {
-            if (points < 1500) return (points / 1500) * 100;
-            if (points < 3000) return ((points - 1500) / 1500) * 100;
-            if (points < 5000) return ((points - 3000) / 2000) * 100;
+            if (points < 2000) return (points / 2000) * 100;
+            if (points < 5000) return ((points - 2000) / 3000) * 100;
+            if (points < 10000) return ((points - 5000) / 5000) * 100;
             return 100;
         }
 
@@ -1897,13 +2780,15 @@
                             <i class="fas ${achievement.icon}"></i>
                         </div>
                         <div class="badge-name">${achievement.name}</div>
+                        <div class="badge-description">${achievement.description}</div>
                     `;
                     badgesContainer.appendChild(badgeElement);
                 }
             });
             
             // إضافة شارات فارغة للمستقبل
-            const emptySlots = 7 - userManager.currentUser.achievements.length;
+            const totalBadges = Object.keys(achievementsDB).length;
+            const emptySlots = totalBadges - userManager.currentUser.achievements.length;
             for (let i = 0; i < emptySlots; i++) {
                 const emptyBadge = document.createElement('div');
                 emptyBadge.className = 'badge';
@@ -1932,8 +2817,8 @@
                 const favoriteItem = document.createElement('div');
                 favoriteItem.className = 'favorite-item';
                 favoriteItem.innerHTML = `
-                    <div class="favorite-text">${text}</div>
-                    <div>
+                    <div class="favorite-text">${text.substring(0, 100)}${text.length > 100 ? '...' : ''}</div>
+                    <div class="favorite-actions">
                         <button class="btn btn-primary" onclick="startFavoriteTraining('${text}')">تدرب</button>
                         <button class="btn btn-outline" onclick="removeFavorite(${index})">
                             <i class="fas fa-trash"></i>
@@ -1942,6 +2827,16 @@
                 `;
                 favoritesList.appendChild(favoriteItem);
             });
+        }
+
+        // تحديث إعدادات التذكير
+        function updateReminderSettings() {
+            if (userManager.currentUser.preferences.dailyReminder) {
+                document.getElementById('dailyReminder').classList.add('active');
+            }
+            if (userManager.currentUser.preferences.weeklyReminder) {
+                document.getElementById('weeklyReminder').classList.add('active');
+            }
         }
 
         // إزالة نص مفضل
@@ -2011,11 +2906,34 @@
                 }
                 soundEnabled = user.preferences.soundEnabled;
                 
+                // عرض رسالة ترحيب
+                showWelcomeMessage(user);
+                
                 return true;
             } catch (error) {
                 showNotification(error.message, 'error');
                 return false;
             }
+        }
+
+        // عرض رسالة ترحيب
+        function showWelcomeMessage(user) {
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'welcome-message';
+            welcomeDiv.innerHTML = `
+                <h2>مرحباً بك ${user.name}!</h2>
+                <p>سعيدون برؤيتك مجدداً. مستعد للتدريب اليوم؟</p>
+                <button class="btn btn-primary" onclick="this.parentElement.remove(); navigateTo('training');">
+                    ابدأ التدريب
+                </button>
+            `;
+            document.body.appendChild(welcomeDiv);
+            
+            setTimeout(() => {
+                if (welcomeDiv.parentElement) {
+                    welcomeDiv.remove();
+                }
+            }, 5000);
         }
 
         // تسجيل مستخدم جديد
@@ -2040,10 +2958,6 @@
                 updateAuthUI();
                 closeAuthModal();
                 showNotification(`تم إنشاء حسابك بنجاح! مرحباً ${user.name}`, 'success');
-                
-                // منح إنجاز التسجيل
-                userManager.addAchievement('first_steps');
-                updateAuthUI();
                 
                 return true;
             } catch (error) {
@@ -2082,6 +2996,25 @@
             showNotification('تم حفظ البيانات بنجاح!', 'success');
         }
 
+        // تبديل التذكيرات
+        function toggleReminder(type) {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول أولاً', 'error');
+                return;
+            }
+
+            const toggle = document.getElementById(type + 'Reminder');
+            toggle.classList.toggle('active');
+            
+            userManager.currentUser.preferences[type + 'Reminder'] = toggle.classList.contains('active');
+            userManager.updateUser(userManager.currentUser);
+            
+            showNotification(
+                `تم ${toggle.classList.contains('active') ? 'تفعيل' : 'تعطيل'} التذكير ${type === 'daily' ? 'اليومي' : 'الأسبوعي'}`,
+                'info'
+            );
+        }
+
         // إظهار الإشعارات
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
@@ -2096,6 +3029,8 @@
                 icon.className = 'fas fa-exclamation-circle';
             } else if (type === 'info') {
                 icon.className = 'fas fa-info-circle';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle';
             }
             
             notificationText.textContent = message;
@@ -2103,7 +3038,7 @@
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 3000);
+            }, 4000);
         }
 
         // التحقق من صحة النموذج
@@ -2154,13 +3089,46 @@
             loadText();
         }
 
+        // اختيار طول النص
+        function selectTextLength(length) {
+            currentTextLength = length;
+            document.querySelectorAll('.text-length-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            loadText();
+        }
+
         // تحميل نص عشوائي
         function loadText() {
-            const difficulty = document.getElementById('difficulty').value;
-            const textArray = textsDB[currentLanguage][difficulty];
-            const randomText = textArray[Math.floor(Math.random() * textArray.length)];
-            document.getElementById('textDisplay').textContent = randomText;
-            document.getElementById('textDisplay').classList.add('active');
+            const textDisplay = document.getElementById('textDisplay');
+            textDisplay.innerHTML = '<div class="text-loader"><i class="fas fa-spinner"></i><p>جاري تحميل النص...</p></div>';
+            
+            // محاكاة تحميل النص
+            setTimeout(() => {
+                const text = userManager.getRandomText(currentLanguage, currentDifficulty, currentTextLength);
+                textDisplay.textContent = text;
+                textDisplay.classList.add('active');
+                
+                // توليد معرف فريد للنص
+                currentTextId = `${currentLanguage}_${currentDifficulty}_${currentTextLength}_${Date.now()}`;
+                
+                // تحميل التقدم المحفوظ
+                loadTrainingProgress();
+            }, 500);
+        }
+
+        // تحميل تقدم التدريب المحفوظ
+        function loadTrainingProgress() {
+            if (!userManager.currentUser) return;
+            
+            const progress = userManager.loadTrainingProgress(currentTextId);
+            if (progress) {
+                document.getElementById('typingArea').value = progress.typedText;
+                document.getElementById('progressFill').style.width = `${progress.progress}%`;
+                
+                showNotification('تم استعادة تقدمك السابق', 'info');
+            }
         }
 
         // بدء التدريب
@@ -2173,8 +3141,9 @@
 
             trainingActive = true;
             startTime = new Date();
-            document.getElementById('typingArea').value = '';
-            document.getElementById('typingArea').focus();
+            const typingArea = document.getElementById('typingArea');
+            typingArea.value = '';
+            typingArea.focus();
             document.getElementById('progressFill').style.width = '0%';
             
             // تشغيل المؤقت
@@ -2187,7 +3156,7 @@
             }, 1000);
 
             // مراقبة الكتابة
-            document.getElementById('typingArea').addEventListener('input', updateStats);
+            typingArea.addEventListener('input', updateStats);
             
             showNotification('بدأ التدريب! حظاً موفقاً', 'info');
         }
@@ -2203,9 +3172,14 @@
             const progress = (typedText.length / originalText.length) * 100;
             document.getElementById('progressFill').style.width = `${Math.min(progress, 100)}%`;
             
+            // حفظ التقدم
+            if (userManager.currentUser && currentTextId) {
+                userManager.saveTrainingProgress(currentTextId, progress, typedText);
+            }
+            
             // حساب الكلمات في الدقيقة
             const timeElapsed = (new Date() - startTime) / 1000 / 60;
-            const wordsTyped = typedText.split(/\s+/).length;
+            const wordsTyped = typedText.split(/\s+/).filter(word => word.length > 0).length;
             const wpm = Math.round(wordsTyped / timeElapsed);
             
             // حساب الدقة
@@ -2216,7 +3190,9 @@
                     if (soundEnabled) playErrorSound();
                 }
             }
-            const accuracy = Math.round(((typedText.length - errors) / typedText.length) * 100) || 100;
+            const accuracy = typedText.length > 0 
+                ? Math.round(((typedText.length - errors) / typedText.length) * 100) 
+                : 100;
 
             // تحديث الواجهة
             document.getElementById('wpm').textContent = wpm;
@@ -2237,8 +3213,8 @@
             const stars = document.querySelectorAll('#trainingRating .star');
             let starCount = 0;
             
-            if (wpm >= 60 && accuracy >= 95) starCount = 5;
-            else if (wpm >= 50 && accuracy >= 90) starCount = 4;
+            if (wpm >= 80 && accuracy >= 95) starCount = 5;
+            else if (wpm >= 60 && accuracy >= 90) starCount = 4;
             else if (wpm >= 40 && accuracy >= 85) starCount = 3;
             else if (wpm >= 30 && accuracy >= 80) starCount = 2;
             else if (wpm >= 20 && accuracy >= 75) starCount = 1;
@@ -2263,8 +3239,11 @@
             if (errors === 0) {
                 userManager.addAchievement('perfectionist');
             }
-            if (wpm >= 80) {
+            if (wpm >= 100) {
                 userManager.addAchievement('speed_demon');
+            }
+            if (userManager.currentUser.stats.streak >= 7) {
+                userManager.addAchievement('consistent');
             }
             
             // إظهار النتائج
@@ -2301,6 +3280,39 @@
             });
             
             showNotification('تم إعادة التدريب', 'info');
+        }
+
+        // بدء تحدي السرعة
+        function startSpeedChallenge() {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول لبدء التحدي', 'error');
+                showAuthModal();
+                return;
+            }
+            
+            navigateTo('training');
+            setTimeout(() => {
+                // تحديد نص قصير للتحدي
+                const text = userManager.getRandomText(currentLanguage, 'beginner', 'short');
+                document.getElementById('textDisplay').textContent = text;
+                document.getElementById('textDisplay').classList.add('active');
+                
+                // بدء التحدي
+                startTraining();
+                
+                showNotification('بدأ تحدي السرعة! لديك دقيقة واحدة', 'warning');
+                
+                // إنهاء التحدي بعد دقيقة
+                setTimeout(() => {
+                    if (trainingActive) {
+                        completeTraining(
+                            parseInt(document.getElementById('wpm').textContent),
+                            parseInt(document.getElementById('accuracy').textContent),
+                            parseInt(document.getElementById('errors').textContent)
+                        );
+                    }
+                }, 60000);
+            }, 100);
         }
 
         // تشغيل صوت الخطأ
@@ -2362,14 +3374,20 @@
                         <h3 class="challenge-title">${challenge.title}</h3>
                         <span class="challenge-badge">${challenge.points} نقطة</span>
                     </div>
-                    <p>${challenge.description}</p>
+                    <p class="challenge-description">${challenge.description}</p>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: ${getChallengeProgress(challenge.id)}%"></div>
                     </div>
-                    <button class="btn btn-primary" onclick="startChallenge(${challenge.id})">
-                        <i class="fas fa-play"></i>
-                        ابدأ التحدي
-                    </button>
+                    <div class="challenge-rewards">
+                        <div class="challenge-points">
+                            <i class="fas fa-coins"></i>
+                            ${challenge.points} نقطة
+                        </div>
+                        <button class="btn btn-primary" onclick="startChallenge(${challenge.id})">
+                            <i class="fas fa-play"></i>
+                            ابدأ التحدي
+                        </button>
+                    </div>
                 `;
                 challengesList.appendChild(challengeCard);
             });
@@ -2413,7 +3431,26 @@
             
             setTimeout(() => {
                 showNotification(`بدأ تحدي: ${challenge.title}`, 'info');
-                // هنا يمكن إضافة إعدادات خاصة بالتحدي
+                
+                // إعداد التحدي
+                if (challenge.targetWords) {
+                    // تحدي عدد الكلمات
+                    const text = userManager.getRandomText(currentLanguage, 'intermediate', 'medium');
+                    document.getElementById('textDisplay').textContent = text;
+                    startTraining();
+                    
+                    if (challenge.timeLimit) {
+                        setTimeout(() => {
+                            if (trainingActive) {
+                                completeTraining(
+                                    parseInt(document.getElementById('wpm').textContent),
+                                    parseInt(document.getElementById('accuracy').textContent),
+                                    parseInt(document.getElementById('errors').textContent)
+                                );
+                            }
+                        }, challenge.timeLimit * 1000);
+                    }
+                }
             }, 100);
         }
 
@@ -2453,16 +3490,16 @@
             // استخدام بيانات المستخدم الحالية
             const userStats = userManager.currentUser ? userManager.currentUser.stats : null;
             const wpmData = userStats && userStats.wpm.length > 0 
-                ? userStats.wpm.slice(-4) 
-                : [30, 35, 42, 48];
+                ? userStats.wpm.slice(-7) 
+                : [30, 35, 42, 48, 55, 62, 68];
             const accuracyData = userStats && userStats.accuracy.length > 0
-                ? userStats.accuracy.slice(-4)
-                : [85, 88, 92, 95];
+                ? userStats.accuracy.slice(-7)
+                : [85, 88, 92, 95, 96, 97, 98];
             
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4'],
+                    labels: ['يوم 1', 'يوم 2', 'يوم 3', 'يوم 4', 'يوم 5', 'يوم 6', 'يوم 7'],
                     datasets: [{
                         label: 'السرعة (كلمة/دقيقة)',
                         data: wpmData,
@@ -2484,6 +3521,10 @@
                     plugins: {
                         legend: {
                             position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'تقدمك خلال الأسبوع الماضي'
                         }
                     },
                     scales: {
@@ -2495,53 +3536,92 @@
             });
         }
 
-        // تصدير الإحصائيات
+        // تصدير الإحصائيات كـ PDF
         function exportStats() {
             if (!userManager.currentUser) {
                 showNotification('يجب تسجيل الدخول لتصدير الإحصائيات', 'error');
                 return;
             }
 
-            showNotification('جاري تحميل التقرير...', 'info');
+            showNotification('جاري إنشاء تقرير PDF...', 'info');
             
-            // إنشاء محتوى التقرير
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // إعداد الخط العربي
+            doc.addFont('https://fonts.gstatic.com/s/cairo/v17/SLXGc1nY6HkvangtZmpQdkhzfH5jkS0.woff2', 'Cairo', 'normal');
+            doc.setFont('Cairo');
+            
             const user = userManager.currentUser;
-            const reportContent = `
-تقرير تقدم المستخدم - نبض الحروف
-=====================================
-
-اسم المستخدم: ${user.name}
-البريد الإلكتروني: ${user.email}
-المستوى الحالي: ${user.stats.level}
-النقاط: ${user.stats.points}
-
-الإحصائيات العامة:
-- أفضل سرعة: ${user.stats.bestSpeed} كلمة/دقيقة
-- إجمالي الجلسات: ${user.stats.sessionsCompleted}
-- معدل التحسن الشهري: ${userManager.calculateMonthlyImprovement()}%
-
-آخر النتائج:
-السرعات الأخيرة: ${user.stats.wpm.slice(-5).join(', ')}
-الدقة الأخيرة: ${user.stats.accuracy.slice(-5).join(', ')}
-
-الإنجازات المحققة:
-${user.achievements.map(a => `- ${achievementsDB[a]?.name || a}`).join('\n')}
-
-تاريخ التقرير: ${new Date().toLocaleDateString('ar')}
-            `;
             
-            // إنشاء وتحميل الملف
-            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `تقرير_${user.name}_${new Date().toISOString().split('T')[0]}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            // العنوان
+            doc.setFontSize(20);
+            doc.text('تقرير تقدم المستخدم - نبض الحروف', 105, 20, { align: 'center' });
+            
+            // المعلومات الأساسية
+            doc.setFontSize(14);
+            doc.text(`اسم المستخدم: ${user.name}`, 20, 40);
+            doc.text(`المستوى: ${user.stats.level}`, 20, 50);
+            doc.text(`النقاط: ${user.stats.points}`, 20, 60);
+            doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString('ar')}`, 20, 70);
+            
+            // الإحصائيات
+            doc.setFontSize(16);
+            doc.text('الإحصائيات العامة:', 20, 90);
+            doc.setFontSize(12);
+            doc.text(`أفضل سرعة: ${user.stats.bestSpeed} كلمة/دقيقة`, 20, 100);
+            doc.text(`إجمالي الجلسات: ${user.stats.sessionsCompleted}`, 20, 110);
+            doc.text(`معدل التحسن الشهري: ${userManager.calculateMonthlyImprovement()}%`, 20, 120);
+            doc.text(`الأيام المتتالية: ${user.stats.streak}`, 20, 130);
+            
+            // حفظ الملف
+            doc.save(`تقرير_${user.name}_${new Date().toISOString().split('T')[0]}.pdf`);
             
             showNotification('تم تحميل التقرير بنجاح!', 'success');
+        }
+
+        // مشاركة التقدم
+        function shareProgress() {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول لمشاركة تقدمك', 'error');
+                return;
+            }
+            
+            showShareModal();
+        }
+
+        // عرض نافذة المشاركة
+        function showShareModal() {
+            document.getElementById('shareModal').classList.add('show');
+        }
+
+        // إغلاق نافذة المشاركة
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('show');
+        }
+
+        // المشاركة على فيسبوك
+        function shareOnFacebook() {
+            const user = userManager.currentUser;
+            const text = `لقد حققت ${user.stats.points} نقطة في نبض الحروف! سرعتي القصوى ${user.stats.bestSpeed} كلمة/دقيقة. حاول أن تتغلب علي!`;
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // المشاركة على تويتر
+        function shareOnTwitter() {
+            const user = userManager.currentUser;
+            const text = `لقد حققت ${user.stats.points} نقطة في نبض الحروف! سرعتي القصوى ${user.stats.bestSpeed} كلمة/دقيقة. حاول أن تتغلب علي! #نبض_الحروف`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank');
+        }
+
+        // المشاركة على واتساب
+        function shareOnWhatsApp() {
+            const user = userManager.currentUser;
+            const text = `لقد حققت ${user.stats.points} نقطة في نبض الحروف! سرعتي القصوى ${user.stats.bestSpeed} كلمة/دقيقة. حاول أن تتغلب علي! ${window.location.href}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
         }
 
         // تبديل الوضع الليلي
@@ -2589,17 +3669,55 @@ ${user.achievements.map(a => `- ${achievementsDB[a]?.name || a}`).join('\n')}
                 case 'profile':
                     updateUserProfileUI();
                     break;
+                case 'privacy':
+                    updatePrivacyDate();
+                    break;
             }
             
-            // إضافة تأثير حركة للصفحة
-            const section = document.getElementById(page);
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                section.style.transition = 'all 0.5s ease';
-                section.style.opacity = '1';
-                section.style.transform = 'translateY(0)';
-            }, 50);
+            // التمرير لأعلى الصفحة
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // تحديث تاريخ سياسة الخصوصية
+        function updatePrivacyDate() {
+            const date = new Date().toLocaleDateString('ar', { year: 'numeric', month: 'long' });
+            document.getElementById('privacyUpdateDate').textContent = date;
+        }
+
+        // عرض دليل المستخدم
+        function showUserGuide() {
+            showNotification('جاري فتح دليل المستخدم...', 'info');
+            // هنا يمكن إضافة نافذة منبثقة أو الانتقال لصفحة الدليل
+        }
+
+        // عرض الأسئلة الشائعة
+        function showFAQ() {
+            showNotification('جاري فتح الأسئلة الشائعة...', 'info');
+            // هنا يمكن إضافة نافذة منبثقة أو الانتقال لصفحة الأسئلة
+        }
+
+        // عرض نموذج الاتصال
+        function showContactForm() {
+            showNotification('جاري فتح نموذج الاتصال...', 'info');
+            // هنا يمكن إضافة نافذة منبثقة أو الانتقال لصفحة الاتصال
+        }
+
+        // عرض نموذج الإبلاغ عن خطأ
+        function showBugReport() {
+            showNotification('جاري فتح نموذج الإبلاغ عن خطأ...', 'info');
+            // هنا يمكن إضافة نافذة منبثقة أو الانتقال لصفحة الإبلاغ
+        }
+
+        // عرض نموذج الاقتراحات
+        function showSuggestionForm() {
+            showNotification('جاري فتح نموذج الاقتراحات...', 'info');
+            // هنا يمكن إضافة نافذة منبثقة أو الانتقال لصفحة الاقتراحات
+        }
+
+        // عرض الدروس التعليمية
+        function showVideoTutorials() {
+            showNotification('جاري فتح الدروس التعليمية...', 'info');
+            // هنا يمكن إضافة نافذة منبثقة أو الانتقال لصفحة الدروس
         }
 
         // تحميل بيانات الملف الشخصي
@@ -2621,7 +3739,7 @@ ${user.achievements.map(a => `- ${achievementsDB[a]?.name || a}`).join('\n')}
                 });
             }, { threshold: 0.1 });
 
-            document.querySelectorAll('.fade-in').forEach(el => {
+            document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right').forEach(el => {
                 observer.observe(el);
             });
         }
@@ -2677,6 +3795,9 @@ ${user.achievements.map(a => `- ${achievementsDB[a]?.name || a}`).join('\n')}
             gsap.from(".nav-links li", {duration: 0.8, y: -30, opacity: 0, stagger: 0.1});
             gsap.from(".hero-content", {duration: 1, y: 50, opacity: 0, delay: 0.3});
             gsap.from(".achievement-card", {duration: 0.8, y: 30, opacity: 0, stagger: 0.2, delay: 0.5});
+            
+            // تحديث تاريخ سياسة الخصوصية
+            updatePrivacyDate();
         });
 
         // إضافة تأثيرات عند التمرير
@@ -2684,15 +3805,23 @@ ${user.achievements.map(a => `- ${achievementsDB[a]?.name || a}`).join('\n')}
             const scrolled = window.pageYOffset;
             const hero = document.querySelector('.hero');
             if (hero) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+                hero.style.transform = `translateY(${scrolled * 0.3}px)`;
             }
         });
 
-        // إغلاق النافذة عند الضغط خارجها
+        // إغلاق النوافذ عند الضغط خارجها
         window.addEventListener('click', function(e) {
-            const modal = document.getElementById('authModal');
-            if (e.target === modal) {
-                closeAuthModal();
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // حفظ التقدم تلقائي قبل إغلاق الصفحة
+        window.addEventListener('beforeunload', function() {
+            if (trainingActive && userManager.currentUser && currentTextId) {
+                const typedText = document.getElementById('typingArea').value;
+                const progress = (typedText.length / document.getElementById('textDisplay').textContent.length) * 100;
+                userManager.saveTrainingProgress(currentTextId, progress, typedText);
             }
         });
     </script>
