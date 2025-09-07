@@ -1,0 +1,2226 @@
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نبض الحروف - إتقان فن الكتابة السريعة</title>
+    
+    <!-- المكتبات الخارجية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- التصميم الأساسي -->
+    <style>
+        /* متغيرات التصميم المتقدمة */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #4facfe;
+            --danger: #f5576c;
+            --warning: #ff9a56;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #2d3748;
+            --bg-light: #f7fafc;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+        
+        /* الإعدادات العامة */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-primary);
+        }
+        body.dark-mode .form-control {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .difficulty-selector select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            min-width: 150px;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .difficulty-selector select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            min-width: 150px;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .difficulty-selector select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            min-width: 150px;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .difficulty-selector select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            min-width: 150px;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* لوحة التدريب */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+        /* صفحة التدريب */
+        .training-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: 100px;
+        }
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .text-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .lang-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .text-length-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .text-display {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            text-align: justify;
+        }
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .typing-area {
+            width: 100%;
+            min-height: 250px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* لوحة التدريب */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* لوحة المتصدرين */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.2rem; }
+        
+       
