@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نبض الحروف - إتقان فن الكتابة السريعة</title>
+    
+    <!-- المكتبات الخارجية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <style>
+        /* متغيرات التصميم المتقدمة */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #4facfe;
+            --danger: #f5576c;
+            --warning: #ff9a56;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #2d3748;
+            --bg-light: #f7fafc;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+
+        /* الوضع الليلي */
+        body.dark-mode {
+            --bg-light: #1a202c;
+            --light: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --dark: #f7fafc;
+        }
+
+        /* الإعدادات العامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Cairo', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* شريط التنقل المحسن */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .navbar {
+            background: rgba(45, 55, 72, 0.95);
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+
+        /* معلومات المستخدم في الناف بار */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            border: 2px solid var(--primary);
+            object-fit: cover;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-level {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* الأزرار المحسنة */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* الصفحة الرئيسية المحسنة */
+        .hero {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* بطاقات الإنجازات */
+        .achievements {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .achievement-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .achievement-card {
+            background: var(--light);
+        }
+
+        .achievement-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .achievement-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .achievement-icon.primary {
+            background: var(--primary-gradient);
+        }
+
+        .achievement-icon.success {
+            background: var(--success-gradient);
+        }
+
+        .achievement-icon.warning {
+            background: var(--secondary-gradient);
+        }
+
+        /* صفحة التدريب المحسنة */
+        .training-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        body.dark-mode .training-container {
+            background: var(--light);
+        }
+
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .difficulty-selector select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .text-display {
+            background: var(--bg-light);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            line-height: 2;
+            font-size: 1.25rem;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+        }
+
+        .text-display.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .typing-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            font-size: 1.1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        body.dark-mode .typing-area {
+            background: var(--dark);
+            color: var(--text-primary);
+            border-color: #4a5568;
+        }
+
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* لوحة الإحصائيات المحسنة */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* نظام النجوم */
+        .rating {
+            display: flex;
+            gap: 0.25rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .star.filled {
+            color: #ffd700;
+            animation: starPulse 0.5s ease;
+        }
+
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* الإشعارات المحسنة */
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .notification.success {
+            border-right: 4px solid var(--success);
+        }
+
+        .notification.error {
+            border-right: 4px solid var(--danger);
+        }
+
+        .notification.info {
+            border-right: 4px solid var(--info);
+        }
+
+        /* بطاقات التحديات */
+        .challenge-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .challenge-card {
+            background: var(--light);
+        }
+
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--secondary-gradient);
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .challenge-badge {
+            background: var(--warning);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* لوحة المتصدرين */
+        .leaderboard {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        body.dark-mode .leaderboard {
+            background: var(--light);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .leaderboard-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        /* الملف الشخصي */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: var(--radius-lg);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: var(--radius-full);
+            border: 4px solid white;
+            box-shadow: var(--shadow-md);
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-level {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .level-badge {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+        }
+
+        /* الشارات والإنجازات */
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        body.dark-mode .badge {
+            background: var(--light);
+            border-color: #4a5568;
+        }
+
+        .badge:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .badge-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* النصوص المفضلة */
+        .favorites-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .favorite-item {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .favorite-item {
+            background: var(--light);
+        }
+
+        .favorite-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .favorite-text {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        /* النوافذ المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        body.dark-mode .modal-content {
+            background: var(--light);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* حقول النماذج */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        body.dark-mode .form-control {
+            background: var(--dark);
+            border-color: #4a5568;
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* تبويبات المصادقة */
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+        }
+
+        body.dark-mode .auth-tabs {
+            background: #2d3748;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .auth-tab.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        /* رسائل الخطأ */
+        .error-message {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* صفحة الدعم */
+        .support-section {
+            padding: 4rem 0;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .support-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .support-card {
+            background: var(--light);
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .support-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .training-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stats-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* تأثيرات الحركة */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">
+                <i class="fas fa-keyboard"></i>
+                <span>نبض الحروف</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#home" class="active">الرئيسية</a></li>
+                <li><a href="#training">التدريب</a></li>
+                <li><a href="#challenges">التحديات</a></li>
+                <li><a href="#stats">الإحصائيات</a></li>
+                <li><a href="#profile">حسابي</a></li>
+                <li><a href="#support">الدعم</a></li>
+            </ul>
+            
+            <div class="nav-actions" id="navActions">
+                <!-- سيتم تحديثها ديناميكياً -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- الصفحة الرئيسية -->
+    <section id="home">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>أتقن فن الكتابة السريعة</h1>
+                <p>طور مهاراتك في الكتابة بالعربية والإنجليزية مع نظام تدريب تفاعلي وممتع</p>
+                <button class="btn btn-primary" onclick="navigateTo('training')">
+                    <i class="fas fa-rocket"></i>
+                    ابدأ التدريب الآن
+                </button>
+            </div>
+        </div>
+        
+        <div class="achievements">
+            <div class="container">
+                <h2 class="section-title">آخر الإنجازات</h2>
+                <div class="achievement-grid">
+                    <div class="achievement-card fade-in">
+                        <div class="achievement-header">
+                            <div class="achievement-icon primary">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h3>أحمد محمد</h3>
+                                <p>حقق سرعة 85 كلمة/دقيقة</p>
+                            </div>
+                        </div>
+                        <div class="rating">
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card fade-in">
+                        <div class="achievement-header">
+                            <div class="achievement-icon success">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div>
+                                <h3>سارة أحمد</h3>
+                                <p>أكملت 10 تحديات متتالية</p>
+                            </div>
+                        </div>
+                        <div class="rating">
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card fade-in">
+                        <div class="achievement-header">
+                            <div class="achievement-icon warning">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div>
+                                <h3>محمد علي</h3>
+                                <p>تحسن بنسبة 40% هذا الشهر</p>
+                            </div>
+                        </div>
+                        <div class="rating">
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star filled"></i>
+                            <i class="fas fa-star star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة التدريب -->
+    <section id="training" style="display:none;">
+        <div class="container">
+            <div class="training-container">
+                <div class="training-header">
+                    <h2>التدريب على الكتابة</h2>
+                    
+                    <div class="language-selector">
+                        <button class="lang-btn active" onclick="selectLanguage('ar')">العربية</button>
+                        <button class="lang-btn" onclick="selectLanguage('en')">English</button>
+                    </div>
+                    
+                    <div class="difficulty-selector">
+                        <label>المستوى:</label>
+                        <select id="difficulty" onchange="loadText()">
+                            <option value="beginner">مبتدئ</option>
+                            <option value="intermediate">متوسط</option>
+                            <option value="advanced">محترف</option>
+                            <option value="expert">خبير</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="text-display" id="textDisplay">
+                    <!-- سيتم عرض النص هنا -->
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                
+                <textarea class="typing-area" id="typingArea" placeholder="ابدأ الكتابة هنا..."></textarea>
+                
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <div class="stat-label">السرعة</div>
+                        <div class="stat-value" id="wpm">0</div>
+                        <div class="stat-label">كلمة/دقيقة</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">الدقة</div>
+                        <div class="stat-value" id="accuracy">100%</div>
+                        <div class="stat-label">دقة</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">الأخطاء</div>
+                        <div class="stat-value" id="errors">0</div>
+                        <div class="stat-label">خطأ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">الوقت</div>
+                        <div class="stat-value" id="timer">00:00</div>
+                        <div class="stat-label">دقيقة</div>
+                    </div>
+                </div>
+                
+                <div class="training-controls">
+                    <button class="btn btn-primary" onclick="startTraining()">
+                        <i class="fas fa-play"></i>
+                        ابدأ التدريب
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetTraining()">
+                        <i class="fas fa-redo"></i>
+                        إعادة
+                    </button>
+                    <button class="btn btn-outline" onclick="toggleSound()">
+                        <i class="fas fa-volume-up" id="soundIcon"></i>
+                    </button>
+                    <button class="btn btn-success" onclick="saveToFavorites()">
+                        <i class="fas fa-heart"></i>
+                        حفظ
+                    </button>
+                </div>
+                
+                <div class="rating" id="trainingRating">
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة التحديات -->
+    <section id="challenges" style="display:none;">
+        <div class="container">
+            <h2 class="section-title">التحديات اليومية</h2>
+            
+            <div class="challenge-tabs">
+                <button class="btn btn-primary" onclick="loadChallenges('daily')">يومية</button>
+                <button class="btn btn-outline" onclick="loadChallenges('weekly')">أسبوعية</button>
+                <button class="btn btn-outline" onclick="loadChallenges('special')">خاصة</button>
+            </div>
+            
+            <div class="challenges-list" id="challengesList">
+                <!-- سيتم تحميلها ديناميكياً -->
+            </div>
+            
+            <div class="leaderboard">
+                <h3 class="section-title">لوحة المتصدرين</h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>المركز</th>
+                            <th>اللاعب</th>
+                            <th>السرعة</th>
+                            <th>الدقة</th>
+                            <th>النقاط</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- سيتم تحميلها ديناميكياً -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة الإحصائيات -->
+    <section id="stats" style="display:none;">
+        <div class="container">
+            <h2 class="section-title">تقدمك المهاري</h2>
+            
+            <div class="chart-container" style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 2rem;">
+                <canvas id="progressChart"></canvas>
+            </div>
+            
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-label">المستوى الحالي</div>
+                    <div class="stat-value" id="currentLevel">مبتدئ</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="levelProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">معدل التحسن الشهري</div>
+                    <div class="stat-value" id="monthlyImprovement">+0%</div>
+                    <div class="stat-label">تحسن</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">أفضل سرعة</div>
+                    <div class="stat-value" id="bestSpeed">0</div>
+                    <div class="stat-label">كلمة/دقيقة</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">إجمالي الجلسات</div>
+                    <div class="stat-value" id="totalSessions">0</div>
+                    <div class="stat-label">جلسة</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="exportStats()">
+                    <i class="fas fa-download"></i>
+                    تصدير التقرير
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة الحساب الشخصي -->
+    <section id="profile" style="display:none;">
+        <div class="container">
+            <div class="profile-header">
+                <img src="https://via.placeholder.com/120" alt="الصورة الشخصية" class="profile-avatar">
+                <div class="profile-info">
+                    <h2 id="userName">اسم المستخدم</h2>
+                    <p>عضو منذ <span id="memberSince">يناير 2024</span></p>
+                    <div class="profile-level">
+                        <span class="level-badge">المستوى: <span id="userLevel">مبتدئ</span></span>
+                        <span><span id="userPoints">0</span> نقطة</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-details" style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 2rem;">
+                <h3>تعديل البيانات الشخصية</h3>
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="nameInput" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="emailInput" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور الجديدة</label>
+                    <input type="password" id="passwordInput" placeholder="اتركها فارغة إذا لم ترد التغيير" class="form-control">
+                </div>
+                <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i>
+                    حفظ التغييرات
+                </button>
+            </div>
+            
+            <div class="achievements-section">
+                <h3 class="section-title">إنجازاتي</h3>
+                <div class="badges-container" id="userBadges">
+                    <!-- سيتم تحميلها ديناميكياً -->
+                </div>
+            </div>
+            
+            <div class="favorites-section">
+                <h3 class="section-title">نصوصي المفضلة</h3>
+                <div class="favorites-list" id="favoritesList">
+                    <!-- سيتم تحميلها ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة الدعم -->
+    <section id="support" style="display:none;">
+        <div class="container">
+            <h2 class="section-title">الدعم والمساعدة</h2>
+            
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>دليل المستخدم</h3>
+                    <p>تعلم كيفية استخدام جميع ميزات الموقع بسهولة</p>
+                    <button class="btn btn-primary">اقرأ الدليل</button>
+                </div>
+                
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3>الأسئلة الشائعة</h3>
+                    <p>أجوبة على أكثر الأسئلة تكراراً من المستخدمين</p>
+                    <button class="btn btn-primary">عرض الأسئلة</button>
+                </div>
+                
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>اتصل بنا</h3>
+                    <p>تواصل مع فريق الدعم للحصول على مساعدة شخصية</p>
+                    <button class="btn btn-primary">راسلنا</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- نافذة تسجيل الدخول والتسجيل -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAuthModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</div>
+                <div class="auth-tab" onclick="switchAuthTab('register')">إنشاء حساب</div>
+            </div>
+            
+            <!-- نموذج تسجيل الدخول -->
+            <form id="loginForm" style="display: block;">
+                <h2>مرحباً بك مجدداً</h2>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" required class="form-control">
+                    <div class="error-message" id="loginEmailError">البريد الإلكتروني مطلوب</div>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" required class="form-control">
+                    <div class="error-message" id="loginPasswordError">كلمة المرور مطلوبة</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    تسجيل الدخول
+                </button>
+                <p style="text-align: center; margin-top: 1rem;">
+                    <a href="#" onclick="switchAuthTab('register')">ليس لديك حساب؟ سجل الآن</a>
+                </p>
+            </form>
+            
+            <!-- نموذج التسجيل -->
+            <form id="registerForm" style="display: none;">
+                <h2>إنشاء حساب جديد</h2>
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="registerName" required class="form-control">
+                    <div class="error-message" id="registerNameError">الاسم مطلوب</div>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="registerEmail" required class="form-control">
+                    <div class="error-message" id="registerEmailError">البريد الإلكتروني مطلوب</div>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="registerPassword" required class="form-control" minlength="6">
+                    <div class="error-message" id="registerPasswordError">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
+                </div>
+                <div class="form-group">
+                    <label>تأكيد كلمة المرور</label>
+                    <input type="password" id="registerConfirmPassword" required class="form-control">
+                    <div class="error-message" id="registerConfirmPasswordError">كلمتا المرور غير متطابقتين</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    إنشاء حساب
+                </button>
+                <p style="text-align: center; margin-top: 1rem;">
+                    <a href="#" onclick="switchAuthTab('login')">لديك حساب بالفعل؟ سجل دخول</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- إشعارات النظام -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">تم الحفظ بنجاح!</span>
+    </div>
+
+    <script>
+        // نظام المستخدمين
+        class UserManager {
+            constructor() {
+                this.users = this.loadUsers();
+                this.currentUser = this.loadCurrentUser();
+            }
+
+            // تحميل المستخدمين من التخزين المحلي
+            loadUsers() {
+                const users = localStorage.getItem('users');
+                return users ? JSON.parse(users) : [];
+            }
+
+            // حفظ المستخدمين في التخزين المحلي
+            saveUsers() {
+                localStorage.setItem('users', JSON.stringify(this.users));
+            }
+
+            // تحميل المستخدم الحالي
+            loadCurrentUser() {
+                const user = localStorage.getItem('currentUser');
+                return user ? JSON.parse(user) : null;
+            }
+
+            // تسجيل مستخدم جديد
+            register(name, email, password) {
+                // التحقق من وجود البريد الإلكتروني
+                if (this.users.find(u => u.email === email)) {
+                    throw new Error('البريد الإلكتروني مسجل بالفعل');
+                }
+
+                // إنشاء مستخدم جديد
+                const user = {
+                    id: Date.now(),
+                    name,
+                    email,
+                    password: this.hashPassword(password),
+                    createdAt: new Date().toISOString(),
+                    stats: {
+                        wpm: [],
+                        accuracy: [],
+                        errors: [],
+                        level: 'beginner',
+                        points: 0,
+                        sessionsCompleted: 0,
+                        bestSpeed: 0
+                    },
+                    preferences: {
+                        language: 'ar',
+                        theme: 'light',
+                        soundEnabled: true
+                    },
+                    favorites: [],
+                    achievements: [],
+                    challenges: {
+                        daily: [],
+                        weekly: [],
+                        special: []
+                    }
+                };
+
+                this.users.push(user);
+                this.saveUsers();
+                return user;
+            }
+
+            // تسجيل الدخول
+            login(email, password) {
+                const user = this.users.find(u => 
+                    u.email === email && u.password === this.hashPassword(password)
+                );
+
+                if (!user) {
+                    throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+                }
+
+                this.currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                return user;
+            }
+
+            // تسجيل الخروج
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+            }
+
+            // تحديث بيانات المستخدم
+            updateUser(userData) {
+                const index = this.users.findIndex(u => u.id === this.currentUser.id);
+                if (index !== -1) {
+                    this.users[index] = { ...this.users[index], ...userData };
+                    this.currentUser = this.users[index];
+                    this.saveUsers();
+                    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                }
+            }
+
+            // تشفير كلمة المرور (بسيط)
+            hashPassword(password) {
+                return btoa(password + 'salt'); // في الإنتاج الحقيقي، استخدم bcrypt
+            }
+
+            // التحقق من صحة البريد الإلكتروني
+            isValidEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            // التحقق من قوة كلمة المرور
+            isStrongPassword(password) {
+                return password.length >= 6;
+            }
+
+            // إضافة إنجاز للمستخدم
+            addAchievement(achievementId) {
+                if (!this.currentUser.achievements.includes(achievementId)) {
+                    this.currentUser.achievements.push(achievementId);
+                    this.updateUser({ achievements: this.currentUser.achievements });
+                }
+            }
+
+            // تحديث إحصائيات المستخدم
+            updateStats(wpm, accuracy, errors) {
+                this.currentUser.stats.wpm.push(wpm);
+                this.currentUser.stats.accuracy.push(accuracy);
+                this.currentUser.stats.errors.push(errors);
+                this.currentUser.stats.sessionsCompleted++;
+                
+                if (wpm > this.currentUser.stats.bestSpeed) {
+                    this.currentUser.stats.bestSpeed = wpm;
+                }
+
+                // حساب النقاط
+                const points = Math.round((wpm * accuracy) / 10);
+                this.currentUser.stats.points += points;
+
+                // تحديث المستوى
+                this.updateLevel();
+
+                this.updateUser(this.currentUser);
+            }
+
+            // تحديث مستوى المستخدم
+            updateLevel() {
+                const points = this.currentUser.stats.points;
+                let level = 'مبتدئ';
+                
+                if (points >= 5000) level = 'خبير';
+                else if (points >= 3000) level = 'محترف';
+                else if (points >= 1500) level = 'متوسط';
+                
+                this.currentUser.stats.level = level;
+            }
+
+            // حساب معدل التحسن الشهري
+            calculateMonthlyImprovement() {
+                const wpmHistory = this.currentUser.stats.wpm;
+                if (wpmHistory.length < 2) return 0;
+                
+                const recent = wpmHistory.slice(-4);
+                const older = wpmHistory.slice(-8, -4);
+                
+                if (older.length === 0) return 0;
+                
+                const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+                const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+                
+                return Math.round(((recentAvg - olderAvg) / olderAvg) * 100);
+            }
+        }
+
+        // إنشاء مدير المستخدمين
+        const userManager = new UserManager();
+
+        // قاعدة بيانات التحديات
+        const challengesDB = {
+            daily: [
+                {
+                    id: 1,
+                    title: "تحدي السرعة القصوى",
+                    description: "اكتب 100 كلمة في أقل من دقيقة واحدة",
+                    targetWords: 100,
+                    timeLimit: 60,
+                    points: 100,
+                    badge: "speed_demon"
+                },
+                {
+                    id: 2,
+                    title: "تحدي الدقة المطلقة",
+                    description: "اكتب نصاً طويلاً بدون أخطاء",
+                    targetAccuracy: 100,
+                    points: 150,
+                    badge: "perfectionist"
+                }
+            ],
+            weekly: [
+                {
+                    id: 3,
+                    title: "تحدي الأسبوع الذهبي",
+                    description: "أكمل 5 تحديات يومية هذا الأسبوع",
+                    requiredChallenges: 5,
+                    points: 300,
+                    badge: "weekly_warrior"
+                }
+            ],
+            special: [
+                {
+                    id: 4,
+                    title: "تحدي الأسطورة",
+                    description: "حقق سرعة 100+ كلمة/دقيقة بدقة 95%+",
+                    targetWpm: 100,
+                    targetAccuracy: 95,
+                    points: 500,
+                    badge: "legend"
+                }
+            ]
+        };
+
+        // قاعدة بيانات الإنجازات
+        const achievementsDB = {
+            speed_demon: { name: "شيطان السرعة", icon: "fa-bolt", description: "حقق سرعة 80+ كلمة/دقيقة" },
+            perfectionist: { name: "المثالي", icon: "fa-gem", description: "أكمل تدريب بدون أخطاء" },
+            weekly_warrior: { name: "محارب الأسبوع", icon: "fa-shield-alt", description: "أكمل 5 تحديات أسبوعية" },
+            legend: { name: "الأسطورة", icon: "fa-crown", description: "حقق أعلى المستويات" },
+            first_steps: { name: "الخطوات الأولى", icon: "fa-baby", description: "أكمل أول جلسة تدريب" },
+            consistent: { name: "المثابر", icon: "fa-calendar-check", description: "تدرب لمدة 7 أيام متتالية" },
+            fast_learner: { name: "سريع التعلم", icon: "fa-graduation-cap", description: "تحسن بنسبة 50% في أسبوع" }
+        };
+
+        // قاعدة بيانات النصوص
+        const textsDB = {
+            ar: {
+                beginner: [
+                    "القط يجري في الحديقة",
+                    "الشمس مشرقة اليوم",
+                    "الطيران يحلق في السماء",
+                    "المطر يهطل بغزارة",
+                    "الأطفال يلعبون في الحديقة"
+                ],
+                intermediate: [
+                    "تعتبر الكتابة السريعة مهارة مهمة في العصر الرقمي",
+                    "التدريب المستمر يحسن من أدائك بشكل ملحوظ",
+                    "التعلم مدى الحياة هو مفتاح النجاح المستمر",
+                    "التكنولوجيا غيرت طريقة حياتنا بشكل جذري"
+                ],
+                advanced: [
+                    "تتطلب الكتابة السريعة تركيزاً عالياً وممارسة يومية لتطوير المهارات الأساسية",
+                    "الإتقان الكامل للوحة المفاتيح يتطلب فهماً عميقاً لتقنيات الكتابة السريعة",
+                    "التواصل الفعال يعتبر من أهم المهارات التي يجب أن يطورها كل فرد في العصر الحديث"
+                ],
+                expert: [
+                    "في عالم يتطور بسرعة فائقة، أصبحت القدرة على الكتابة بسرعة ودقة عالية مهارة أساسية لا غنى عنها في سوق العمل التنافسي، حيث أن الإنتاجية تعتمد بشكل كبير على القدرة على معالجة المعلومات وتحويلها إلى نصوص مكتوبة بفعالية عالية"
+                ]
+            },
+            en: {
+                beginner: [
+                    "The cat runs fast",
+                    "Sun is shining today",
+                    "Birds fly high",
+                    "Rain falls heavily",
+                    "Children play in the garden"
+                ],
+                intermediate: [
+                    "Fast typing is an essential skill in digital age",
+                    "Practice improves performance significantly",
+                    "Lifelong learning is the key to continuous success",
+                    "Technology has changed our lives dramatically"
+                ],
+                advanced: [
+                    "Mastering touch typing requires dedication and consistent practice over time",
+                    "Complete keyboard mastery requires deep understanding of typing techniques",
+                    "Effective communication is one of the most important skills to develop"
+                ],
+                expert: [
+                    "In a rapidly evolving world, the ability to type quickly and accurately has become an essential skill in the competitive job market, where productivity heavily depends on the ability to process information and convert it into effectively written text"
+                ]
+            }
+        };
+
+        // متغيرات عامة
+        let currentLanguage = 'ar';
+        let trainingActive = false;
+        let startTime;
+        let soundEnabled = true;
+        let currentChallengeType = 'daily';
+
+        // تحديث واجهة المستخدم بناءً على حالة تسجيل الدخول
+        function updateAuthUI() {
+            const navActions = document.getElementById('navActions');
+            
+            if (userManager.currentUser) {
+                // المستخدم مسجل دخوله
+                navActions.innerHTML = `
+                    <div class="user-info">
+                        <img src="https://via.placeholder.com/40" alt="${userManager.currentUser.name}" class="user-avatar">
+                        <div class="user-details">
+                            <div class="user-name">${userManager.currentUser.name}</div>
+                            <div class="user-level">المستوى: ${userManager.currentUser.stats.level}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" onclick="toggleDarkMode()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        خروج
+                    </button>
+                `;
+                
+                // تحديث بيانات المستخدم في الصفحة الشخصية
+                updateUserProfileUI();
+            } else {
+                // المستخدم غير مسجل دخوله
+                navActions.innerHTML = `
+                    <button class="btn btn-primary" onclick="showAuthModal()">
+                        <i class="fas fa-user"></i>
+                        <span>تسجيل الدخول</span>
+                    </button>
+                    <button class="btn btn-outline" onclick="toggleDarkMode()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                `;
+            }
+        }
+
+        // تحديث واجهة الملف الشخصي
+        function updateUserProfileUI() {
+            if (!userManager.currentUser) return;
+            
+            const user = userManager.currentUser;
+            
+            // تحديث المعلومات الأساسية
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('nameInput').value = user.name;
+            document.getElementById('emailInput').value = user.email;
+            document.getElementById('userLevel').textContent = user.stats.level;
+            document.getElementById('userPoints').textContent = user.stats.points;
+            document.getElementById('memberSince').textContent = new Date(user.createdAt).toLocaleDateString('ar', { month: 'long', year: 'numeric' });
+            
+            // تحديث الإحصائيات
+            document.getElementById('currentLevel').textContent = user.stats.level;
+            document.getElementById('bestSpeed').textContent = user.stats.bestSpeed;
+            document.getElementById('totalSessions').textContent = user.stats.sessionsCompleted;
+            
+            // حساب وتحديث معدل التحسن
+            const improvement = userManager.calculateMonthlyImprovement();
+            document.getElementById('monthlyImprovement').textContent = `${improvement > 0 ? '+' : ''}${improvement}%`;
+            
+            // تحديث شريط تقدم المستوى
+            const levelProgress = calculateLevelProgress(user.stats.points);
+            document.getElementById('levelProgress').style.width = `${levelProgress}%`;
+            
+            // تحديث الإنجازات
+            updateUserBadges();
+            
+            // تحديث النصوص المفضلة
+            updateUserFavorites();
+        }
+
+        // حساب تقدم المستوى
+        function calculateLevelProgress(points) {
+            if (points < 1500) return (points / 1500) * 100;
+            if (points < 3000) return ((points - 1500) / 1500) * 100;
+            if (points < 5000) return ((points - 3000) / 2000) * 100;
+            return 100;
+        }
+
+        // تحديث شارات المستخدم
+        function updateUserBadges() {
+            const badgesContainer = document.getElementById('userBadges');
+            badgesContainer.innerHTML = '';
+            
+            userManager.currentUser.achievements.forEach(achievementId => {
+                const achievement = achievementsDB[achievementId];
+                if (achievement) {
+                    const badgeElement = document.createElement('div');
+                    badgeElement.className = 'badge';
+                    badgeElement.innerHTML = `
+                        <div class="badge-icon">
+                            <i class="fas ${achievement.icon}"></i>
+                        </div>
+                        <div class="badge-name">${achievement.name}</div>
+                    `;
+                    badgesContainer.appendChild(badgeElement);
+                }
+            });
+            
+            // إضافة شارات فارغة للمستقبل
+            const emptySlots = 7 - userManager.currentUser.achievements.length;
+            for (let i = 0; i < emptySlots; i++) {
+                const emptyBadge = document.createElement('div');
+                emptyBadge.className = 'badge';
+                emptyBadge.style.opacity = '0.3';
+                emptyBadge.innerHTML = `
+                    <div class="badge-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="badge-name">مقفل</div>
+                `;
+                badgesContainer.appendChild(emptyBadge);
+            }
+        }
+
+        // تحديث النصوص المفضلة
+        function updateUserFavorites() {
+            const favoritesList = document.getElementById('favoritesList');
+            favoritesList.innerHTML = '';
+            
+            if (userManager.currentUser.favorites.length === 0) {
+                favoritesList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">لا توجد نصوص مفضلة بعد</p>';
+                return;
+            }
+            
+            userManager.currentUser.favorites.forEach((text, index) => {
+                const favoriteItem = document.createElement('div');
+                favoriteItem.className = 'favorite-item';
+                favoriteItem.innerHTML = `
+                    <div class="favorite-text">${text}</div>
+                    <div>
+                        <button class="btn btn-primary" onclick="startFavoriteTraining('${text}')">تدرب</button>
+                        <button class="btn btn-outline" onclick="removeFavorite(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                favoritesList.appendChild(favoriteItem);
+            });
+        }
+
+        // إزالة نص مفضل
+        function removeFavorite(index) {
+            userManager.currentUser.favorites.splice(index, 1);
+            userManager.updateUser({ favorites: userManager.currentUser.favorites });
+            updateUserFavorites();
+            showNotification('تم حذف النص من المفضلة', 'info');
+        }
+
+        // بدء التدريب على نص مفضل
+        function startFavoriteTraining(text) {
+            navigateTo('training');
+            setTimeout(() => {
+                document.getElementById('textDisplay').textContent = text;
+                document.getElementById('textDisplay').classList.add('active');
+            }, 100);
+        }
+
+        // عرض نافذة المصادقة
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('show');
+        }
+
+        // إغلاق نافذة المصادقة
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('show');
+            // إعادة تعيين النماذج
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+            // إخفاء رسائل الخطأ
+            document.querySelectorAll('.error-message').forEach(msg => {
+                msg.classList.remove('show');
+            });
+        }
+
+        // تبديل تبويبات المصادقة
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabs = document.querySelectorAll('.auth-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
+        }
+
+        // تسجيل الدخول
+        function login(email, password) {
+            try {
+                const user = userManager.login(email, password);
+                updateAuthUI();
+                closeAuthModal();
+                showNotification(`مرحباً بك مجدداً ${user.name}!`, 'success');
+                
+                // تطبيق تفضيلات المستخدم
+                if (user.preferences.theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                }
+                soundEnabled = user.preferences.soundEnabled;
+                
+                return true;
+            } catch (error) {
+                showNotification(error.message, 'error');
+                return false;
+            }
+        }
+
+        // تسجيل مستخدم جديد
+        function register(name, email, password, confirmPassword) {
+            try {
+                // التحقق من تطابق كلمتي المرور
+                if (password !== confirmPassword) {
+                    throw new Error('كلمتا المرور غير متطابقتين');
+                }
+
+                // التحقق من صحة البريد الإلكتروني
+                if (!userManager.isValidEmail(email)) {
+                    throw new Error('بريد إلكتروني غير صالح');
+                }
+
+                // التحقق من قوة كلمة المرور
+                if (!userManager.isStrongPassword(password)) {
+                    throw new Error('كلمة المرور ضعيفة جداً');
+                }
+
+                const user = userManager.register(name, email, password);
+                updateAuthUI();
+                closeAuthModal();
+                showNotification(`تم إنشاء حسابك بنجاح! مرحباً ${user.name}`, 'success');
+                
+                // منح إنجاز التسجيل
+                userManager.addAchievement('first_steps');
+                updateAuthUI();
+                
+                return true;
+            } catch (error) {
+                showNotification(error.message, 'error');
+                return false;
+            }
+        }
+
+        // تسجيل الخروج
+        function logout() {
+            userManager.logout();
+            updateAuthUI();
+            showNotification('تم تسجيل الخروج بنجاح', 'info');
+            navigateTo('home');
+        }
+
+        // حفظ بيانات الملف الشخصي
+        function saveProfile() {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول أولاً', 'error');
+                return;
+            }
+
+            const name = document.getElementById('nameInput').value;
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            const userData = { name, email };
+            
+            // إذا تم إدخال كلمة مرور جديدة
+            if (password) {
+                userData.password = userManager.hashPassword(password);
+            }
+
+            userManager.updateUser(userData);
+            showNotification('تم حفظ البيانات بنجاح!', 'success');
+        }
+
+        // إظهار الإشعارات
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const icon = notification.querySelector('i');
+            
+            // تحديث الأيقونة والنوع
+            notification.className = `notification ${type}`;
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'info') {
+                icon.className = 'fas fa-info-circle';
+            }
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // التحقق من صحة النموذج
+        function validateForm(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                const errorElement = document.getElementById(input.id + 'Error');
+                
+                if (!input.value.trim()) {
+                    errorElement.classList.add('show');
+                    isValid = false;
+                } else {
+                    errorElement.classList.remove('show');
+                }
+
+                // التحقق الخاص بحقل كلمة المرور في التسجيل
+                if (formId === 'registerForm' && input.id === 'registerPassword') {
+                    if (input.value.length < 6) {
+                        errorElement.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                        errorElement.classList.add('show');
+                        isValid = false;
+                    }
+                }
+
+                // التحقق من تطابق كلمتي المرور
+                if (formId === 'registerForm' && input.id === 'registerConfirmPassword') {
+                    const password = document.getElementById('registerPassword').value;
+                    if (input.value !== password) {
+                        errorElement.classList.add('show');
+                        isValid = false;
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        // تبديل اللغة
+        function selectLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            loadText();
+        }
+
+        // تحميل نص عشوائي
+        function loadText() {
+            const difficulty = document.getElementById('difficulty').value;
+            const textArray = textsDB[currentLanguage][difficulty];
+            const randomText = textArray[Math.floor(Math.random() * textArray.length)];
+            document.getElementById('textDisplay').textContent = randomText;
+            document.getElementById('textDisplay').classList.add('active');
+        }
+
+        // بدء التدريب
+        function startTraining() {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول لبدء التدريب', 'error');
+                showAuthModal();
+                return;
+            }
+
+            trainingActive = true;
+            startTime = new Date();
+            document.getElementById('typingArea').value = '';
+            document.getElementById('typingArea').focus();
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // تشغيل المؤقت
+            const timerInterval = setInterval(() => {
+                if (!trainingActive) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                updateTimer();
+            }, 1000);
+
+            // مراقبة الكتابة
+            document.getElementById('typingArea').addEventListener('input', updateStats);
+            
+            showNotification('بدأ التدريب! حظاً موفقاً', 'info');
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            if (!trainingActive) return;
+
+            const typedText = document.getElementById('typingArea').value;
+            const originalText = document.getElementById('textDisplay').textContent;
+            
+            // حساب التقدم
+            const progress = (typedText.length / originalText.length) * 100;
+            document.getElementById('progressFill').style.width = `${Math.min(progress, 100)}%`;
+            
+            // حساب الكلمات في الدقيقة
+            const timeElapsed = (new Date() - startTime) / 1000 / 60;
+            const wordsTyped = typedText.split(/\s+/).length;
+            const wpm = Math.round(wordsTyped / timeElapsed);
+            
+            // حساب الدقة
+            let errors = 0;
+            for (let i = 0; i < typedText.length; i++) {
+                if (typedText[i] !== originalText[i]) {
+                    errors++;
+                    if (soundEnabled) playErrorSound();
+                }
+            }
+            const accuracy = Math.round(((typedText.length - errors) / typedText.length) * 100) || 100;
+
+            // تحديث الواجهة
+            document.getElementById('wpm').textContent = wpm;
+            document.getElementById('accuracy').textContent = `${accuracy}%`;
+            document.getElementById('errors').textContent = errors;
+            
+            // تحديث النجوم بناءً على الأداء
+            updateStars(wpm, accuracy);
+            
+            // إكمال التدريب
+            if (typedText.length >= originalText.length) {
+                completeTraining(wpm, accuracy, errors);
+            }
+        }
+
+        // تحديث النجوم
+        function updateStars(wpm, accuracy) {
+            const stars = document.querySelectorAll('#trainingRating .star');
+            let starCount = 0;
+            
+            if (wpm >= 60 && accuracy >= 95) starCount = 5;
+            else if (wpm >= 50 && accuracy >= 90) starCount = 4;
+            else if (wpm >= 40 && accuracy >= 85) starCount = 3;
+            else if (wpm >= 30 && accuracy >= 80) starCount = 2;
+            else if (wpm >= 20 && accuracy >= 75) starCount = 1;
+            
+            stars.forEach((star, index) => {
+                if (index < starCount) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        // إكمال التدريب
+        function completeTraining(wpm, accuracy, errors) {
+            trainingActive = false;
+            
+            // تحديث إحصائيات المستخدم
+            userManager.updateStats(wpm, accuracy, errors);
+            
+            // منح الإنجازات
+            if (errors === 0) {
+                userManager.addAchievement('perfectionist');
+            }
+            if (wpm >= 80) {
+                userManager.addAchievement('speed_demon');
+            }
+            
+            // إظهار النتائج
+            let message = `أحسنت! سرعتك: ${wpm} كلمة/دقيقة، دقتك: ${accuracy}%`;
+            if (errors === 0) message += ' - بدون أخطاء!';
+            
+            showNotification(message, 'success');
+            
+            // تحديث واجهة المستخدم
+            updateAuthUI();
+        }
+
+        // تحديث المؤقت
+        function updateTimer() {
+            const elapsed = Math.floor((new Date() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+        }
+
+        // إعادة تعيين التدريب
+        function resetTraining() {
+            trainingActive = false;
+            document.getElementById('typingArea').value = '';
+            document.getElementById('wpm').textContent = '0';
+            document.getElementById('accuracy').textContent = '100%';
+            document.getElementById('errors').textContent = '0';
+            document.getElementById('timer').textContent = '00:00';
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // إعادة النجوم
+            document.querySelectorAll('#trainingRating .star').forEach(star => {
+                star.classList.remove('filled');
+            });
+            
+            showNotification('تم إعادة التدريب', 'info');
+        }
+
+        // تشغيل صوت الخطأ
+        function playErrorSound() {
+            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
+            audio.play();
+        }
+
+        // تبديل الصوت
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+            
+            // حفظ التفضيل
+            if (userManager.currentUser) {
+                userManager.currentUser.preferences.soundEnabled = soundEnabled;
+                userManager.updateUser(userManager.currentUser);
+            }
+            
+            showNotification(
+                soundEnabled ? 'تم تفعيل الصوت' : 'تم كتم الصوت',
+                'info'
+            );
+        }
+
+        // حفظ النص كمفضل
+        function saveToFavorites() {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول لحفظ النصوص', 'error');
+                return;
+            }
+
+            const text = document.getElementById('textDisplay').textContent;
+            
+            if (!userManager.currentUser.favorites.includes(text)) {
+                userManager.currentUser.favorites.push(text);
+                userManager.updateUser({ favorites: userManager.currentUser.favorites });
+                updateUserFavorites();
+                showNotification('تم الحفظ في المفضلة!', 'success');
+            } else {
+                showNotification('النص موجود بالفعل في المفضلة', 'info');
+            }
+        }
+
+        // تحميل التحديات
+        function loadChallenges(type) {
+            currentChallengeType = type;
+            const challengesList = document.getElementById('challengesList');
+            challengesList.innerHTML = '';
+            
+            const challenges = challengesDB[type];
+            
+            challenges.forEach(challenge => {
+                const challengeCard = document.createElement('div');
+                challengeCard.className = 'challenge-card';
+                challengeCard.innerHTML = `
+                    <div class="challenge-header">
+                        <h3 class="challenge-title">${challenge.title}</h3>
+                        <span class="challenge-badge">${challenge.points} نقطة</span>
+                    </div>
+                    <p>${challenge.description}</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${getChallengeProgress(challenge.id)}%"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startChallenge(${challenge.id})">
+                        <i class="fas fa-play"></i>
+                        ابدأ التحدي
+                    </button>
+                `;
+                challengesList.appendChild(challengeCard);
+            });
+            
+            // تحديث أزرار التبويب
+            document.querySelectorAll('.challenge-tabs .btn').forEach(btn => {
+                btn.className = 'btn btn-outline';
+            });
+            event.target.className = 'btn btn-primary';
+        }
+
+        // حساب تقدم التحدي
+        function getChallengeProgress(challengeId) {
+            if (!userManager.currentUser) return 0;
+            
+            const userChallenges = userManager.currentUser.challenges[currentChallengeType];
+            const challenge = userChallenges.find(c => c.id === challengeId);
+            
+            return challenge ? challenge.progress : 0;
+        }
+
+        // بدء التحدي
+        function startChallenge(challengeId) {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول لبدء التحدي', 'error');
+                showAuthModal();
+                return;
+            }
+            
+            // البحث عن التحدي
+            let challenge = null;
+            for (const type in challengesDB) {
+                challenge = challengesDB[type].find(c => c.id === challengeId);
+                if (challenge) break;
+            }
+            
+            if (!challenge) return;
+            
+            // الانتقال لصفحة التدريب مع إعدادات التحدي
+            navigateTo('training');
+            
+            setTimeout(() => {
+                showNotification(`بدأ تحدي: ${challenge.title}`, 'info');
+                // هنا يمكن إضافة إعدادات خاصة بالتحدي
+            }, 100);
+        }
+
+        // تحديث لوحة المتصدرين
+        function updateLeaderboard() {
+            const leaderboardBody = document.getElementById('leaderboardBody');
+            leaderboardBody.innerHTML = '';
+            
+            // ترتيب المستخدمين حسب النقاط
+            const sortedUsers = [...userManager.users].sort((a, b) => b.stats.points - a.stats.points);
+            
+            // عرض أفضل 10 مستخدمين
+            sortedUsers.slice(0, 10).forEach((user, index) => {
+                const row = document.createElement('tr');
+                const avgWpm = user.stats.wpm.length > 0 
+                    ? Math.round(user.stats.wpm.reduce((a, b) => a + b, 0) / user.stats.wpm.length)
+                    : 0;
+                const avgAccuracy = user.stats.accuracy.length > 0
+                    ? Math.round(user.stats.accuracy.reduce((a, b) => a + b, 0) / user.stats.accuracy.length)
+                    : 0;
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${user.name}</td>
+                    <td>${avgWpm} كلمة/دقيقة</td>
+                    <td>${avgAccuracy}%</td>
+                    <td>${user.stats.points}</td>
+                `;
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        // إنشاء رسم بياني
+        function createProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            // استخدام بيانات المستخدم الحالية
+            const userStats = userManager.currentUser ? userManager.currentUser.stats : null;
+            const wpmData = userStats && userStats.wpm.length > 0 
+                ? userStats.wpm.slice(-4) 
+                : [30, 35, 42, 48];
+            const accuracyData = userStats && userStats.accuracy.length > 0
+                ? userStats.accuracy.slice(-4)
+                : [85, 88, 92, 95];
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4'],
+                    datasets: [{
+                        label: 'السرعة (كلمة/دقيقة)',
+                        data: wpmData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'الدقة (%)',
+                        data: accuracyData,
+                        borderColor: '#4facfe',
+                        backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // تصدير الإحصائيات
+        function exportStats() {
+            if (!userManager.currentUser) {
+                showNotification('يجب تسجيل الدخول لتصدير الإحصائيات', 'error');
+                return;
+            }
+
+            showNotification('جاري تحميل التقرير...', 'info');
+            
+            // إنشاء محتوى التقرير
+            const user = userManager.currentUser;
+            const reportContent = `
+تقرير تقدم المستخدم - نبض الحروف
+=====================================
+
+اسم المستخدم: ${user.name}
+البريد الإلكتروني: ${user.email}
+المستوى الحالي: ${user.stats.level}
+النقاط: ${user.stats.points}
+
+الإحصائيات العامة:
+- أفضل سرعة: ${user.stats.bestSpeed} كلمة/دقيقة
+- إجمالي الجلسات: ${user.stats.sessionsCompleted}
+- معدل التحسن الشهري: ${userManager.calculateMonthlyImprovement()}%
+
+آخر النتائج:
+السرعات الأخيرة: ${user.stats.wpm.slice(-5).join(', ')}
+الدقة الأخيرة: ${user.stats.accuracy.slice(-5).join(', ')}
+
+الإنجازات المحققة:
+${user.achievements.map(a => `- ${achievementsDB[a]?.name || a}`).join('\n')}
+
+تاريخ التقرير: ${new Date().toLocaleDateString('ar')}
+            `;
+            
+            // إنشاء وتحميل الملف
+            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `تقرير_${user.name}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('تم تحميل التقرير بنجاح!', 'success');
+        }
+
+        // تبديل الوضع الليلي
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            
+            // حفظ تفضيل المستخدم
+            if (userManager.currentUser) {
+                userManager.currentUser.preferences.theme = isDark ? 'dark' : 'light';
+                userManager.updateUser(userManager.currentUser);
+            }
+            
+            showNotification(
+                isDark ? 'تم تفعيل الوضع الليلي' : 'تم تفعيل الوضع النهاري',
+                'info'
+            );
+        }
+
+        // التنقل بين الصفحات
+        function navigateTo(page) {
+            document.querySelectorAll('section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(page).style.display = 'block';
+            
+            // تحديث الروابط النشطة
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${page}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // تحديث محتوى الصفحة
+            switch(page) {
+                case 'challenges':
+                    loadChallenges('daily');
+                    updateLeaderboard();
+                    break;
+                case 'stats':
+                    setTimeout(createProgressChart, 100);
+                    break;
+                case 'profile':
+                    updateUserProfileUI();
+                    break;
+            }
+            
+            // إضافة تأثير حركة للصفحة
+            const section = document.getElementById(page);
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                section.style.transition = 'all 0.5s ease';
+                section.style.opacity = '1';
+                section.style.transform = 'translateY(0)';
+            }, 50);
+        }
+
+        // تحميل بيانات الملف الشخصي
+        function loadProfile() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // إضافة تأثيرات التمرير
+        function addScrollEffects() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfile();
+            updateAuthUI();
+            loadText();
+            addScrollEffects();
+            
+            // إضافة مستمعي الأحداث
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('href').substring(1);
+                    navigateTo(page);
+                });
+            });
+
+            // معالجة نموذج تسجيل الدخول
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateForm('loginForm')) {
+                    return;
+                }
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                login(email, password);
+            });
+
+            // معالجة نموذج التسجيل
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateForm('registerForm')) {
+                    return;
+                }
+                
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                
+                register(name, email, password, confirmPassword);
+            });
+            
+            // إضافة تأثيرات GSAP
+            gsap.from(".logo", {duration: 1, y: -50, opacity: 0, ease: "bounce.out"});
+            gsap.from(".nav-links li", {duration: 0.8, y: -30, opacity: 0, stagger: 0.1});
+            gsap.from(".hero-content", {duration: 1, y: 50, opacity: 0, delay: 0.3});
+            gsap.from(".achievement-card", {duration: 0.8, y: 30, opacity: 0, stagger: 0.2, delay: 0.5});
+        });
+
+        // إضافة تأثيرات عند التمرير
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // إغلاق النافذة عند الضغط خارجها
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('authModal');
+            if (e.target === modal) {
+                closeAuthModal();
+            }
+        });
+    </script>
+</body>
+</html>
